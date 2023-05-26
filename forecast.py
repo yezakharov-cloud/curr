@@ -4,6 +4,14 @@ from datetime import datetime
 from tensorflow import keras
 import tensorflow as tf
 
+import io
+import streamlit as st
+from PIL import Image
+import numpy as np
+from tensorflow.keras.applications import EfficientNetB0
+from tensorflow.keras.preprocessing import image
+from tensorflow.keras.applications.efficientnet import preprocess_input, decode_predictions
+
 # Load the CSV file and preprocess the data
 def load_data(file_path):
     df = pd.read_csv(file_path)
