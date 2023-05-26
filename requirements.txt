@@ -1,6 +1,17 @@
 #streamlit
 #tensorflow-cpu
 
+opencv-contrib-python-headless
+tensorflow-cpu==1.15
+streamlit==0.65.2
+numpy
+pandas
+pillow
+keras==2.3.0
+pathlib
+matplotlib
+python-resize-image
+
 keybert==0.6.0
 keyphrase_vectorizers==0.0.10
 matplotlib==3.5.2
