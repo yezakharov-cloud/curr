@@ -1,15 +1,13 @@
-import streamlit as st
 import pandas as pd
+import numpy as np
 import tensorflow as tf
-import torch
-import torch.nn.functional as F
-from torch.utils.data import Dataset, DataLoader
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import MinMaxScaler
+import streamlit as st
 
-# Function to load historical exchange rate data from CSV file
+# Load the historical exchange rate data from a CSV file
 def load_data(file_path):
     data = pd.read_csv(file_path)
-    st.write("Last 3 records of uploaded data:")
-    st.write(data.tail(3))
     return data
 
 # Preprocess the data
@@ -45,31 +43,40 @@ def predict(model, X_test):
 
 # Main function
 def main():
+    # Set Streamlit app title and layout
+    st.title("Exchange Rate Prediction")
+    st.sidebar.title("Options")
+    
     # Load and preprocess the data
-    file_path = 'exchange_rates.csv'
-    data = load_data(file_path)
-    data = preprocess_data(data)
+    file_path = st.sidebar.file_uploader("Upload CSV file", type="csv")
     
-    # Split the data into input features (X) and target variable (y)
-    X = data[['Sequence Number', 'Date']].values
-    y = data['Exchange Rate'].values
-    
-    # Split the data into training and testing sets
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
-    
-    # Build the neural network model
-    input_shape = (X_train.shape[1],)
-    model = build_model(input_shape)
-    
-    # Train the model
-    train_model(model, X_train, y_train)
-    
-    # Make predictions
-    predictions = predict(model, X_test)
-    
-    # Print the predicted exchange rates
-    print(predictions)
+    if file_path is not None:
+        data = load_data(file_path)
+        data = preprocess_data(data)
+        
+        # Split the data into input features (X) and target variable (y)
+        X = data[['Sequence Number', 'Date']].values
+        y = data['Exchange Rate'].values
+        
+        # Split the data into training and testing sets
+        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+        
+        # Build the neural network model
+        input_shape = (X_train.shape[1],)
+        model = build_model(input_shape)
+        
+        # Train the model
+        train_model(model, X_train, y_train)
+        
+        # Make predictions
+        predictions = predict(model, X_test)
+        
+        # Display predicted exchange rates
+        st.write("Predicted Exchange Rates:")
+        st.write(predictions)
+    else:
+        st.sidebar.write("Please upload a CSV file.")
 
-# Run the program
+# Run the app
 if __name__ == '__main__':
     main()
