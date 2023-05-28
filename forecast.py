@@ -21,10 +21,10 @@ def create_tensorflow_model():
     return model
 
 # Function to train a TensorFlow model
-def train_tensorflow_model(model, data, end_date):
-   # Split the data into features and target
-    x = data.loc[data['Date'] <= end_date, ['Sequence Number']]
-    y = data.loc[data['Date'] <= end_date, ['Exchange Rate']]
+def train_tensorflow_model(model, data):
+    # Split the data into features and target
+    x = data[['Sequence Number']]
+    y = data[['Exchange Rate']]
 
     # Normalize the data
     x = (x - x.mean()) / x.std()
