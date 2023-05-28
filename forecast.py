@@ -56,6 +56,7 @@ def train_model(model, data):
 
             inputs = inputs.unsqueeze(2)
             inputs = inputs.permute(0, 2, 1)  # Reshape the input tensor
+            inputs = inputs.float()  # Convert to float data type
             outputs = model(inputs)
 
             loss = criterion(outputs, inputs[:, -1, :])
