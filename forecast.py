@@ -6,6 +6,10 @@ from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense, LSTM
 from sklearn.preprocessing import MinMaxScaler
 
+import torch
+import torch.nn as nn
+from torch.utils.data import Dataset, DataLoader
+
 # Load historical exchange rate data from CSV file
 def load_data(filename):
     data = pd.read_csv(filename)
