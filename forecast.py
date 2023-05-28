@@ -75,7 +75,6 @@ def main():
 
     # TensorFlow model training button
     if st.button("Train a TensorFlow model"):
-        tensorflow_model = create_tensorflow_model()
         train_tensorflow_model(tensorflow_model, data)
 
     # PyTorch model training button
