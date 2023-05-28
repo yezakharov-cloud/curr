@@ -8,6 +8,8 @@ from torch.utils.data import Dataset, DataLoader
 # Function to load historical exchange rate data from CSV file
 def load_data(file_path):
     data = pd.read_csv(file_path)
+    st.write("Last 3 records of uploaded data:")
+    st.write(data.tail(3))
     return data
 
 # Function to create a TensorFlow model
