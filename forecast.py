@@ -35,6 +35,11 @@ def train_tensorflow_model(model, data):
     model.fit(x, y, epochs=10, batch_size=32)
     st.write("Training completed!")
 
+ # Function to predict exchange rate using TensorFlow model
+def predict_tensorflow_rate(date):
+    predicted_rate = model.predict(date)
+    st.write("Predicted exchange rate using TensorFlow:", predicted_rate)
+    
 # Function to create a PyTorch model
 def create_pytorch_model():
     # Implement your PyTorch model creation code here
@@ -46,12 +51,6 @@ def create_pytorch_model():
 def train_pytorch_model(model, data):
     # Implement your PyTorch model training code here
     st.write("Training PyTorch model...")
-
-# Function to predict exchange rate using TensorFlow model
-def predict_tensorflow_rate(date):
-
-    predicted_rate = model.predict(date)
-    st.write("Predicted exchange rate using TensorFlow:", predicted_rate)
 
 # Function to predict exchange rate using PyTorch model
 def predict_pytorch_rate(date):
