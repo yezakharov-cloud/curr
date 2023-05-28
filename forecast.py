@@ -20,7 +20,7 @@ def preprocess_data(data):
     
     # Scale the exchange rate values to a range between 0 and 1
     scaler = MinMaxScaler()
-    data['Exchange Rate'] = scaler.fit_transform(data['Exchange Rate'].values.reshape(-1, 1))
+    data['Rate'] = scaler.fit_transform(data['Rate'].values.reshape(-1, 1))
     
     return data
 
@@ -57,8 +57,8 @@ def main():
         data = preprocess_data(data)
         
         # Split the data into input features (X) and target variable (y)
-        X = data[['Sequence Number', 'Date']].values
-        y = data['Exchange Rate'].values
+        X = data[['Number', 'Date']].values
+        y = data['Rate'].values
         
         # Split the data into training and testing sets
         X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
@@ -72,6 +72,11 @@ def main():
         
         # Make predictions
         predictions = predict(model, X_test)
+        
+        # Inverse scale the predictions
+        scaler = MinMaxScaler()
+        scaler.fit(data['Rate'].values.reshape(-1, 1))
+        predictions = scaler.inverse_transform(predictions)
         
         # Display predicted exchange rates
         st.write("Predicted Exchange Rates:")
