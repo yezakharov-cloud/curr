@@ -1,16 +1,14 @@
+import streamlit as st
 import pandas as pd
 import numpy as np
 import tensorflow as tf
-from sklearn.model_selection import train_test_split
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Dense, LSTM
 from sklearn.preprocessing import MinMaxScaler
-import streamlit as st
 
-
-# Load the historical exchange rate data from a CSV file
-def load_data(file_path):
-    data = pd.read_csv(file_path)
-    st.write("Last 3 records of uploaded data:")
-    st.write(data.tail(3))
+# Load historical exchange rate data from CSV file
+def load_data(filename):
+    data = pd.read_csv(filename)
     return data
 
 # Create a LSTM model for exchange rate prediction
