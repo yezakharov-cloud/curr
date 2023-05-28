@@ -68,8 +68,7 @@ def main():
     st.header("Upload Historical Data (CSV)")
     file = st.file_uploader("Upload CSV", type="csv")
     if file is not None:
-        data = load_data(file.name)
-        st.success("File uploaded successfully!")
+        data = load_data(file)
 
     # TensorFlow model training button
     if st.button("Train a TensorFlow model"):
