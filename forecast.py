@@ -69,9 +69,10 @@ def main():
     file = st.file_uploader("Upload CSV", type="csv")
     if file is not None:
         data = load_data(file)
+        
      # Button to create TensorFlow model
      if st.button("Create TensorFlow Model"):
-      tensorflow_model = create_tensorflow_model()
+        tensorflow_model = create_tensorflow_model()
         
 
     # TensorFlow model training button
