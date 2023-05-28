@@ -34,6 +34,8 @@ def train_tensorflow_model(model, data):
     model.compile(optimizer='adam', loss='mean_squared_error')
     model.fit(x, y, epochs=10, batch_size=32)
     st.write("Training completed!")
+    predicted_rate = model.predict(date)
+    st.write("Predicted exchange rate using TensorFlow:", predicted_rate)
 
  # Function to predict exchange rate using TensorFlow model
 def predict_tensorflow_rate(date):
