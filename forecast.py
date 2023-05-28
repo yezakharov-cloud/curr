@@ -59,7 +59,7 @@ def main():
         data = load_data(uploaded_file)
         
         st.subheader('Historical Data')
-        st.write(data)
+        st.dataframe(data)  # Display all loaded values
         
         model = create_model()
         
