@@ -92,7 +92,7 @@ def main():
 
         model = create_model()
 
-           st.subheader('Train Model')
+        st.subheader('Train Model')
         train_model(model, data['Rate'].values.reshape(-1, 1))
         st.write('Model training complete.')
 
