@@ -71,7 +71,7 @@ def main():
         data = load_data(file)
         
      # Button to create TensorFlow model
-     if st.button("Create TensorFlow Model"):
+    if st.button("Create TensorFlow Model"):
         tensorflow_model = create_tensorflow_model()
         
 
