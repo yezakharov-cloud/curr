@@ -12,88 +12,64 @@ def load_data(file_path):
     st.write(data.tail(3))
     return data
 
-# Function to create a TensorFlow model
-def create_tensorflow_model():
-    # Implement your TensorFlow model creation code here
-    model = tf.keras.models.Sequential()
-    model.add(tf.keras.layers.Dense(64, activation='relu'))
-    model.add(tf.keras.layers.Dense(1, activation='linear'))
-    return model
-
-# Function to train a TensorFlow model
-def train_tensorflow_model(model, data):
-    # Split the data into features and target
-    x = data[['Sequence Number']]
-    y = data[['Exchange Rate']]
-
-    # Normalize the data
-    x = (x - x.mean()) / x.std()
-    y = (y - y.mean()) / y.std()
-
-    # Compile and train the model
-    model.compile(optimizer='adam', loss='mean_squared_error')
-    model.fit(x, y, epochs=10, batch_size=32)
-    st.write("Training completed!")
-    predicted_rate = model.predict(date)
-    st.write("Predicted exchange rate using TensorFlow:", predicted_rate)
-
- # Function to predict exchange rate using TensorFlow model
-def predict_tensorflow_rate(date):
-    predicted_rate = model.predict(date)
-    st.write("Predicted exchange rate using TensorFlow:", predicted_rate)
+# Preprocess the data
+def preprocess_data(data):
+    # Convert dates to numerical values
+    data['Date'] = pd.to_datetime(data['Date'])
+    data['Date'] = data['Date'].map(pd.Timestamp.to_julian_date)
     
-# Function to create a PyTorch model
-def create_pytorch_model():
-    # Implement your PyTorch model creation code here
-    model = torch.nn.Sequential()
-    # Add layers to the model
+    # Scale the exchange rate values to a range between 0 and 1
+    scaler = MinMaxScaler()
+    data['Exchange Rate'] = scaler.fit_transform(data['Exchange Rate'].values.reshape(-1, 1))
+    
+    return data
+
+# Build the neural network model
+def build_model(input_shape):
+    model = tf.keras.Sequential([
+        tf.keras.layers.Dense(64, activation='relu', input_shape=input_shape),
+        tf.keras.layers.Dense(64, activation='relu'),
+        tf.keras.layers.Dense(1)
+    ])
     return model
 
-# Function to train a PyTorch model
-def train_pytorch_model(model, data):
-    # Implement your PyTorch model training code here
-    st.write("Training PyTorch model...")
+# Train the model
+def train_model(model, X_train, y_train):
+    model.compile(optimizer='adam', loss='mean_squared_error')
+    model.fit(X_train, y_train, epochs=50, batch_size=32)
 
-# Function to predict exchange rate using PyTorch model
-def predict_pytorch_rate(date):
-    # Implement your PyTorch prediction code here
-    st.write("Predicting exchange rate using PyTorch...")
+# Make predictions using the trained model
+def predict(model, X_test):
+    predictions = model.predict(X_test)
+    return predictions
 
 # Main function
 def main():
-    st.title("Exchange Rate Prediction")
+    # Load and preprocess the data
+    file_path = 'exchange_rates.csv'
+    data = load_data(file_path)
+    data = preprocess_data(data)
+    
+    # Split the data into input features (X) and target variable (y)
+    X = data[['Sequence Number', 'Date']].values
+    y = data['Exchange Rate'].values
+    
+    # Split the data into training and testing sets
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+    
+    # Build the neural network model
+    input_shape = (X_train.shape[1],)
+    model = build_model(input_shape)
+    
+    # Train the model
+    train_model(model, X_train, y_train)
+    
+    # Make predictions
+    predictions = predict(model, X_test)
+    
+    # Print the predicted exchange rates
+    print(predictions)
 
-    # CSV file upload
-    st.header("Upload Historical Data (CSV)")
-    file = st.file_uploader("Upload CSV", type="csv")
-    if file is not None:
-        data = load_data(file)
-        
-     # Button to create TensorFlow model
-    if st.button("Create TensorFlow Model"):
-        tensorflow_model = create_tensorflow_model()
-        
-    # TensorFlow model training button
-    if st.button("Train a TensorFlow model"):
-        tensorflow_model = create_tensorflow_model()
-        train_tensorflow_model(tensorflow_model, data)
-
-    # PyTorch model training button
-    if st.button("Train a PyTorch model"):
-        pytorch_model = create_pytorch_model()
-        train_pytorch_model(pytorch_model, data)
-
-    # Date selection for prediction
-    st.header("Select Date for Exchange Rate Prediction")
-    selected_date = st.date_input("Select a date")
-
-    # Predict exchange rate using TensorFlow button
-    if st.button("Currency rate prediction based on the TensorFlow model"):
-        predict_tensorflow_rate(selected_date)
-
-    # Predict exchange rate using PyTorch button
-    if st.button("Currency rate prediction based on the PyTorch model"):
-        predict_pytorch_rate(selected_date)
-
-if __name__ == "__main__":
+# Run the program
+if __name__ == '__main__':
     main()
