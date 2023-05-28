@@ -14,7 +14,8 @@ def load_data(file_path):
 def create_tensorflow_model():
     # Implement your TensorFlow model creation code here
     model = tf.keras.models.Sequential()
-    # Add layers to the model
+    model.add(tf.keras.layers.Dense(64, activation='relu'))
+    model.add(tf.keras.layers.Dense(1, activation='linear'))
     return model
 
 # Function to train a TensorFlow model
