@@ -20,8 +20,18 @@ def create_tensorflow_model():
 
 # Function to train a TensorFlow model
 def train_tensorflow_model(model, data):
-    # Implement your TensorFlow model training code here
-    st.write("Training TensorFlow model...")
+    # Split the data into features and target
+    x = data[['Sequence Number']]
+    y = data[['Exchange Rate']]
+
+    # Normalize the data
+    x = (x - x.mean()) / x.std()
+    y = (y - y.mean()) / y.std()
+
+    # Compile and train the model
+    model.compile(optimizer='adam', loss='mean_squared_error')
+    model.fit(x, y, epochs=10, batch_size=32)
+    st.write("Training completed!")
 
 # Function to create a PyTorch model
 def create_pytorch_model():
