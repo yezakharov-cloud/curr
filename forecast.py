@@ -1,6 +1,5 @@
 import streamlit as st
 import pandas as pd
-import numpy as np
 import torch
 import torch.nn as nn
 from torch.utils.data import Dataset, DataLoader
@@ -56,7 +55,7 @@ def train_model(model, data):
             optimizer.zero_grad()
 
             inputs = inputs.unsqueeze(2)
-            inputs = torch.tensor(inputs, dtype=torch.float)  # Convert input data to torch.Tensor
+            inputs = inputs.permute(0, 2, 1)  # Reshape the input tensor
             outputs = model(inputs)
 
             loss = criterion(outputs, inputs[:, -1, :])
@@ -72,7 +71,6 @@ def predict_rate(model, data):
     scaler = MinMaxScaler(feature_range=(0, 1))
     scaled_data = scaler.fit_transform(data)
     inputs = torch.from_numpy(scaled_data).unsqueeze(0).unsqueeze(2).float()
-    inputs = torch.tensor(inputs, dtype=torch.float)  # Convert input data to torch.Tensor
     prediction = model(inputs)
     prediction = scaler.inverse_transform(prediction.detach().numpy())[0][0]
     return prediction
@@ -103,4 +101,3 @@ def main():
 # Run the application
 if __name__ == '__main__':
     main()
-    
