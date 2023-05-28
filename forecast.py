@@ -13,78 +13,66 @@ def load_data(file_path):
     st.write(data.tail(3))
     return data
 
-# Preprocess the data
-def preprocess_data(data):
-    # Convert dates to numerical values
-    data['Date'] = pd.to_datetime(data['Date'])
-    data['Date'] = data['Date'].map(pd.Timestamp.to_julian_date)
-    
-    # Scale the exchange rate values to a range between 0 and 1
-    scaler = MinMaxScaler()
-    data['Rate'] = scaler.fit_transform(data['Rate'].values.reshape(-1, 1))
-    
-    return data
-
-# Build the neural network model
-def build_model(input_shape):
-    model = tf.keras.Sequential([
-        tf.keras.layers.Dense(64, activation='relu', input_shape=input_shape),
-        tf.keras.layers.Dense(64, activation='relu'),
-        tf.keras.layers.Dense(1)
-    ])
+# Create a LSTM model for exchange rate prediction
+def create_model():
+    model = Sequential()
+    model.add(LSTM(units=50, return_sequences=True, input_shape=(1, 1)))
+    model.add(LSTM(units=50))
+    model.add(Dense(units=1))
+    model.compile(optimizer='adam', loss='mean_squared_error')
     return model
 
-# Train the model
-def train_model(model, X_train, y_train):
-    model.compile(optimizer='adam', loss='mean_squared_error')
-    model.fit(X_train, y_train, epochs=50, batch_size=32)
+# Train the LSTM model
+def train_model(model, data):
+    scaler = MinMaxScaler(feature_range=(0, 1))
+    scaled_data = scaler.fit_transform(data)
+    
+    x_train = []
+    y_train = []
+    for i in range(1, len(scaled_data)):
+        x_train.append(scaled_data[i-1:i])
+        y_train.append(scaled_data[i])
+    
+    x_train, y_train = np.array(x_train), np.array(y_train)
+    x_train = np.reshape(x_train, (x_train.shape[0], x_train.shape[1], 1))
+    
+    model.fit(x_train, y_train, epochs=20, batch_size=1, verbose=2)
 
-# Make predictions using the trained model
-def predict(model, X_test):
-    predictions = model.predict(X_test)
-    return predictions
+# Predict the exchange rate using the trained model
+def predict_rate(model, data):
+    scaler = MinMaxScaler(feature_range=(0, 1))
+    scaled_data = scaler.fit_transform(data)
+    
+    x_test = np.array([scaled_data[-1]])
+    x_test = np.reshape(x_test, (x_test.shape[0], x_test.shape[1], 1))
+    
+    predicted_rate = model.predict(x_test)
+    predicted_rate = scaler.inverse_transform(predicted_rate)
+    return predicted_rate[0][0]
 
 # Main function
 def main():
-    # Set Streamlit app title and layout
-    st.title("Exchange Rate Prediction")
-    st.sidebar.title("Options")
+    st.title('Exchange Rate Prediction')
     
-    # Load and preprocess the data
-    file_path = st.sidebar.file_uploader("Upload CSV file", type="csv")
+    # Upload historical data file
+    uploaded_file = st.file_uploader('Upload CSV file', type=['csv'])
     
-    if file_path is not None:
-        data = load_data(file_path)
-        data = preprocess_data(data)
+    if uploaded_file is not None:
+        data = load_data(uploaded_file)
         
-        # Split the data into input features (X) and target variable (y)
-        X = data[['Number', 'Date']].values
-        y = data['Rate'].values
+        st.subheader('Historical Data')
+        st.write(data)
         
-        # Split the data into training and testing sets
-        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+        model = create_model()
         
-        # Build the neural network model
-        input_shape = (X_train.shape[1],)
-        model = build_model(input_shape)
+        st.subheader('Train Model')
+        train_model(model, data['Rate'].values.reshape(-1, 1))
+        st.write('Model training complete.')
         
-        # Train the model
-        train_model(model, X_train, y_train)
-        
-        # Make predictions
-        predictions = predict(model, X_test)
-        
-        # Inverse scale the predictions
-        scaler = MinMaxScaler()
-        scaler.fit(data['Rate'].values.reshape(-1, 1))
-        predictions = scaler.inverse_transform(predictions)
-        
-        # Display predicted exchange rates
-        st.write("Predicted Exchange Rates:")
-        st.write(predictions)
-    else:
-        st.sidebar.write("Please upload a CSV file.")
+        st.subheader('Exchange Rate Prediction')
+        prediction = predict_rate(model, data['Rate'].values.reshape(-1, 1))
+        st.write('Predicted exchange rate:', prediction)
 
-# Run the app
+# Run the application
 if __name__ == '__main__':
     main()
