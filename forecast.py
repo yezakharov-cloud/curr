@@ -49,10 +49,8 @@ def train_pytorch_model(model, data):
 
 # Function to predict exchange rate using TensorFlow model
 def predict_tensorflow_rate(date):
-    # Normalize the input date
-    normalized_date = (date - data['Sequence Number'].mean()) / data['Sequence Number'].std()
-    # Perform prediction
-    predicted_rate = model.predict(normalized_date)
+
+    predicted_rate = model.predict(date)
     st.write("Predicted exchange rate using TensorFlow:", predicted_rate)
 
 # Function to predict exchange rate using PyTorch model
