@@ -5,6 +5,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import MinMaxScaler
 import streamlit as st
 
+
 # Load the historical exchange rate data from a CSV file
 def load_data(file_path):
     data = pd.read_csv(file_path)
