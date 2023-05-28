@@ -56,6 +56,7 @@ def train_model(model, data):
             optimizer.zero_grad()
 
             inputs = inputs.unsqueeze(2)
+            inputs = torch.tensor(inputs, dtype=torch.float)  # Convert input data to torch.Tensor
             outputs = model(inputs)
 
             loss = criterion(outputs, inputs[:, -1, :])
@@ -71,6 +72,7 @@ def predict_rate(model, data):
     scaler = MinMaxScaler(feature_range=(0, 1))
     scaled_data = scaler.fit_transform(data)
     inputs = torch.from_numpy(scaled_data).unsqueeze(0).unsqueeze(2).float()
+    inputs = torch.tensor(inputs, dtype=torch.float)  # Convert input data to torch.Tensor
     prediction = model(inputs)
     prediction = scaler.inverse_transform(prediction.detach().numpy())[0][0]
     return prediction
@@ -90,7 +92,7 @@ def main():
 
         model = create_model()
 
-        st.subheader('Train Model')
+           st.subheader('Train Model')
         train_model(model, data['Rate'].values.reshape(-1, 1))
         st.write('Model training complete.')
 
@@ -101,3 +103,4 @@ def main():
 # Run the application
 if __name__ == '__main__':
     main()
+    
