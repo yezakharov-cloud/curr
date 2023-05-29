@@ -3,9 +3,12 @@ import numpy as np
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import MinMaxScaler
 import streamlit as st
-from cntk import input_variable, relu, training_session, Trainer, learning_rate_schedule, UnitType
-from cntk.layers import Dense
-from cntk.ops import squared_error
+import theano
+import theano.tensor as T
+from theano import function
+from theano import shared
+from theano.tensor.nnet import sigmoid
+from theano.tensor import tanh
 
 # Load the historical exchange rate data from a CSV file
 def load_data(file_path):
@@ -24,30 +27,61 @@ def preprocess_data(data):
     
     return data
 
-# Build the neural network model using Microsoft CNTK
+# Build the neural network model using Theano
 def build_model(input_dim):
-    input_var = input_variable(input_dim)
-    hidden_layer = Dense(64, activation=relu)(input_var)
-    output_layer = Dense(1)(hidden_layer)
-    return output_layer
+    W_xh = shared(np.random.randn(input_dim, 64) * 0.01)
+    W_hh = shared(np.random.randn(64, 64) * 0.01)
+    W_hy = shared(np.random.randn(64, 1) * 0.01)
+    b_h = shared(np.zeros(64))
+    b_y = shared(0.)
+    
+    X = T.matrix()
+    y = T.vector()
+    
+    def step(x_t, h_tm1):
+        h_t = sigmoid(T.dot(x_t, W_xh) + T.dot(h_tm1, W_hh) + b_h)
+        y_t = T.dot(h_t, W_hy) + b_y
+        return h_t, y_t
+    
+    [h, y_pred], _ = theano.scan(
+        step,
+        sequences=X,
+        outputs_info=[dict(initial=T.zeros(64)), None]
+    )
+    
+    cost = T.mean((y - y_pred.flatten())**2)
+    gradients = T.grad(cost, [W_xh, W_hh, W_hy, b_h, b_y])
+    
+    learning_rate = 0.1
+    updates = [
+        (param, param - learning_rate * gradient)
+        for param, gradient in zip([W_xh, W_hh, W_hy, b_h, b_y], gradients)
+    ]
+    
+    train_model = function(
+        inputs=[X, y],
+        outputs=cost,
+        updates=updates
+    )
+    
+    predict_model = function(
+        inputs=[X],
+        outputs=y_pred.flatten()
+    )
+    
+    return train_model, predict_model
 
 # Train the model
-def train_model(model, X_train, y_train):
-    learning_rate = learning_rate_schedule(0.1, UnitType.minibatch)
-    loss = squared_error(model, y_train)
-    learner = Trainer(model, loss, learning_rate)
-    batch_size = 32
+def train_model(train_fn, X_train, y_train):
     num_epochs = 50
     for epoch in range(num_epochs):
-        for i in range(0, len(X_train), batch_size):
-            x_batch = X_train[i:i+batch_size]
-            y_batch = y_train[i:i+batch_size]
-            learner.train_minibatch({model.arguments[0]: x_batch, loss.arguments[0]: y_batch})
-    return model
+        cost = train_fn(X_train, y_train)
+        if epoch % 10 == 0:
+            print("Epoch {}: Cost = {}".format(epoch, cost))
 
 # Make predictions using the trained model
-def predict(model, X_test):
-    return model.eval({model.arguments[0]: X_test})
+def predict(predict_fn, X_test):
+    return predict_fn(X_test)
 
 # Main function
 def main():
@@ -62,32 +96,4 @@ def main():
         data = load_data(file_path)
         data = preprocess_data(data)
         
-        # Split the data into input features (X) and target variable (y)
-        X = data[['Number', 'Date']].values
-        y = data['Rate'].values
-        
-        # Split the data into training and testing sets
-        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
-        
-        # Build the neural network model
-        input_dim = X_train.shape[1]
-        model = build_model(input_dim)
-        
-        # Train the model
-        model = train_model(model, X_train, y_train)
-        
-        # Make predictions
-        predictions = predict(model, X_test)
-        
-        # Inverse scale the predictions
-        scaler = MinMaxScaler()
-        scaler.fit(data['Rate'].values.reshape(-1, 1))
-        predictions = scaler.inverse_transform(predictions)
-        
-        # Display predicted exchange rates
-        st.write("Predicted Exchange Rates:")
-        st.write(predictions)
-    else:
-        st.sidebar.write("Please upload a CSV file.")
-
-#
+        #
