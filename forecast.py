@@ -57,9 +57,11 @@ def train_model(data):
 # Predict the exchange rate using the trained model
 def predict_rate(model, rate, scaler):
     x = torch.Tensor([rate])
+    x = scaler.transform(x.reshape(-1, 1))
     prediction = model(x)
-    prediction = scaler.inverse_transform(prediction.detach().numpy())
+    prediction = scaler.inverse_transform(prediction.detach().numpy().reshape(-1, 1))
     return prediction.item()
+
 
 
 # Streamlit application
