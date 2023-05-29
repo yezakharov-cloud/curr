@@ -17,6 +17,10 @@ def preprocess_data(data):
     scaler = MinMaxScaler()
     data['Rate'] = scaler.fit_transform(data['Rate'].values.reshape(-1, 1))
 
+    # Convert the date to numerical representation
+    data['Date'] = pd.to_datetime(data['Date'])
+    data['Date'] = (data['Date'] - data['Date'].min()).dt.days
+
     return data
 
 # Build the neural network model using Keras
@@ -50,26 +54,4 @@ def main():
         data = preprocess_data(data)
 
         # Split the data into input features (X) and target variable (y)
-        X = data[['Number', 'Date']].values.astype(float)
-        y = data['Rate'].values.astype(float)
-
-        # Split the data into training and testing sets
-        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
-
-        # Build the neural network model
-        input_dim = X_train.shape[1]
-        model = build_model(input_dim)
-
-        # Train the model
-        train_model(model, X_train, y_train)
-
-        # Make predictions
-        predictions = predict(model, X_test)
-
-        # Display the predictions
-        st.write("Exchange Rate Predictions:")
-        st.write(pd.DataFrame({'Actual Rate': y_test, 'Predicted Rate': predictions}))
-
-# Run the Streamlit app
-if __name__ == '__main__':
-    main()
+        X = data[['Number',
