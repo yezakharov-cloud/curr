@@ -55,11 +55,11 @@ def predict_rate(model, number):
 # Streamlit application
 def main():
     st.title('Exchange Rate Prediction')
-    st.write('Enter the historical exchange rate data file (CSV format):')
-    file_path = st.text_input('File Path')
+    st.write('Upload the historical exchange rate data file (CSV format):')
+    file = st.file_uploader('Choose a CSV file', type='csv')
     
-    if st.button('Predict'):
-        data = load_data(file_path)
+    if file is not None:
+        data = load_data(file.name)
         data = preprocess_data(data)
         model = train_model(data)
         last_number = data['Number'].values[-1]
