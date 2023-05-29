@@ -2,6 +2,7 @@ import streamlit as st
 import torch
 import torch.nn as nn
 import pandas as pd
+import numpy as np
 
 # Define the neural network model using PyTorch
 class ExchangeRatePredictor(nn.Module):
