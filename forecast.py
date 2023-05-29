@@ -2,12 +2,6 @@ import streamlit as st
 import torch
 import torch.nn as nn
 import pandas as pd
-import numpy as np
-
-# Load historical exchange rate data from CSV file
-def load_data(filename):
-    data = pd.read_csv(filename)
-    return data
 
 # Define the neural network model using PyTorch
 class ExchangeRatePredictor(nn.Module):
@@ -22,6 +16,12 @@ class ExchangeRatePredictor(nn.Module):
         x = self.relu(x)
         x = self.fc2(x)
         return x
+
+# Load historical exchange rate data from a CSV file
+def load_data(file_path):
+    data = pd.read_csv(file_path)
+    return data
+
 # Preprocess the data for training the neural network
 def preprocess_data(data):
     # Normalize the data
@@ -55,16 +55,16 @@ def predict_rate(model, number):
 # Streamlit application
 def main():
     st.title('Exchange Rate Prediction')
-    st.write('Enter the historical exchange rate data file (CSV format):')
-    file_path = st.file_uploader('Upload CSV file', type=['csv'])
-    
-    if st.button('Predict'):
-        data = load_data(file_path)
+    st.write('Upload the historical exchange rate data file (CSV format):')
+    file = st.file_uploader('Choose a CSV file', type='csv')
+
+    if file is not None:
+        data = load_data(file.name)
         data = preprocess_data(data)
         model = train_model(data)
         last_number = data['Number'].values[-1]
         prediction = predict_rate(model, last_number + 1)
-        st.write(f'The predicted exchange rate for the next time step is: {prediction}')
+        st.write(f'The predicted exchange rate for the next time step is: {prediction * data["Rate"].std() + data["Rate"].mean()}')
 
 if __name__ == '__main__':
     main()
