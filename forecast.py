@@ -57,7 +57,7 @@ def predict_rate(model, number):
 def main():
     st.title('Exchange Rate Prediction')
     st.write('Upload the historical exchange rate data file (CSV format):')
-    file = st.file_uploader('Choose a CSV file', type='csv')
+    file = st.file_uploader('Upload CSV file', type=['csv'])
 
     if file is not None:
         data = load_data(file.name)
