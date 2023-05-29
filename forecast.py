@@ -4,6 +4,7 @@ from pybrain.tools.shortcuts import buildNetwork
 from pybrain.supervised.trainers import BackpropTrainer
 from pybrain.datasets import SupervisedDataSet
 
+
 # Load historical data from CSV file
 def load_data(file_path):
     data = pd.read_csv(file_path)
