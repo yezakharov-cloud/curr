@@ -29,8 +29,10 @@ class ExchangeRatePredictor(nn.Module):
 # Preprocess the data for training the neural network
 def preprocess_data(data):
     # Normalize the data
-    data['Rate'] = (data['Rate'] - data['Rate'].mean()) / data['Rate'].std()
-    return data
+    scaler = MinMaxScaler(feature_range=(-1, 1))
+    data['Rate'] = scaler.fit_transform(data['Rate'].values.reshape(-1, 1))
+    return data, scaler
+
 
 # Train the neural network
 def train_model(data):
@@ -50,11 +52,14 @@ def train_model(data):
 
     return model
 
+
 # Predict the exchange rate using the trained model
-def predict_rate(model, rate):
+def predict_rate(model, rate, scaler):
     x = torch.Tensor([rate])
     prediction = model(x)
+    prediction = scaler.inverse_transform(prediction.detach().numpy())
     return prediction.item()
+
 
 # Streamlit application
 def main():
@@ -64,12 +69,12 @@ def main():
 
     if file is not None:
         data = load_data(file)
-        data = preprocess_data(data)
+        data, scaler = preprocess_data(data)
         model = train_model(data)
         last_rate = data['Rate'].values[-1]
-        prediction = predict_rate(model, last_rate)
-        prediction_denormalized = prediction * data['Rate'].std() + data['Rate'].mean()
-        st.write(f'The predicted exchange rate for the next time step is: {prediction_denormalized}')
+        prediction = predict_rate(model, last_rate, scaler)
+        st.write(f'The predicted exchange rate for the next time step is: {prediction}')
+
 
 if __name__ == '__main__':
     main()
