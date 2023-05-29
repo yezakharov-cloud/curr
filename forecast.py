@@ -1,70 +1,70 @@
 import streamlit as st
+import torch
+import torch.nn as nn
 import pandas as pd
-from pybrain.structure import FeedForwardNetwork, LinearLayer, SigmoidLayer, FullConnection
-from pybrain.supervised.trainers import BackpropTrainer
-from pybrain.datasets import SupervisedDataSet
-from datetime import datetime
+
+# Define the neural network model using PyTorch
+class ExchangeRatePredictor(nn.Module):
+    def __init__(self):
+        super(ExchangeRatePredictor, self).__init__()
+        self.fc1 = nn.Linear(1, 10)
+        self.relu = nn.ReLU()
+        self.fc2 = nn.Linear(10, 1)
+
+    def forward(self, x):
+        x = self.fc1(x)
+        x = self.relu(x)
+        x = self.fc2(x)
+        return x
 
 # Load historical exchange rate data from a CSV file
-@st.cache
 def load_data(file_path):
     data = pd.read_csv(file_path)
     return data
 
-# Prepare data for training the neural network
-def prepare_data(data):
-    ds = SupervisedDataSet(1, 1)
-    for i in range(len(data)):
-        ds.addSample(data['Number'][i], data['Rate'][i])
-    return ds
+# Preprocess the data for training the neural network
+def preprocess_data(data):
+    # Normalize the data
+    data['Rate'] = (data['Rate'] - data['Rate'].mean()) / data['Rate'].std()
+    return data
 
 # Train the neural network
-def train_network(ds):
-    net = FeedForwardNetwork()
-    in_layer = LinearLayer(1)
-    hidden_layer = SigmoidLayer(3)
-    out_layer = LinearLayer(1)
-    net.addInputModule(in_layer)
-    net.addModule(hidden_layer)
-    net.addOutputModule(out_layer)
-    in_to_hidden = FullConnection(in_layer, hidden_layer)
-    hidden_to_out = FullConnection(hidden_layer, out_layer)
-    net.addConnection(in_to_hidden)
-    net.addConnection(hidden_to_out)
-    net.sortModules()
-    trainer = BackpropTrainer(net, ds)
-    trainer.trainEpochs(1000)
-    return net
+def train_model(data):
+    model = ExchangeRatePredictor()
+    criterion = nn.MSELoss()
+    optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
 
-# Predict exchange rate using the trained network
-def predict_rate(net, input_data):
-    output = net.activate(input_data)
-    return output
+    x = torch.Tensor(data['Number'].values).unsqueeze(1)
+    y = torch.Tensor(data['Rate'].values).unsqueeze(1)
 
-# Main function
+    for epoch in range(1000):
+        optimizer.zero_grad()
+        outputs = model(x)
+        loss = criterion(outputs, y)
+        loss.backward()
+        optimizer.step()
+
+    return model
+
+# Predict the exchange rate using the trained model
+def predict_rate(model, number):
+    x = torch.Tensor([number])
+    prediction = model(x)
+    return prediction.item()
+
+# Streamlit application
 def main():
-    st.title("Exchange Rate Prediction")
-
-    # Load historical data from CSV
-    file_path = st.file_uploader("Upload a CSV file", type="csv")
-    if file_path is not None:
+    st.title('Exchange Rate Prediction')
+    st.write('Enter the historical exchange rate data file (CSV format):')
+    file_path = st.text_input('File Path')
+    
+    if st.button('Predict'):
         data = load_data(file_path)
-        st.write("Historical Data:")
-        st.write(data)
-
-        # Prepare data for training
-        ds = prepare_data(data)
-
-        # Train the neural network
-        net = train_network(ds)
-
-        # Prediction
-        st.write("Prediction:")
-        number = st.number_input("Enter a number:")
-        prediction = predict_rate(net, number)
-        st.write(f"Predicted rate: {prediction[0]:.2f}")
-    else:
-        st.write("Please upload a CSV file.")
+        data = preprocess_data(data)
+        model = train_model(data)
+        last_number = data['Number'].values[-1]
+        prediction = predict_rate(model, last_number + 1)
+        st.write(f'The predicted exchange rate for the next time step is: {prediction}')
 
 if __name__ == '__main__':
     main()
