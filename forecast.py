@@ -50,8 +50,8 @@ def main():
         data = preprocess_data(data)
 
         # Split the data into input features (X) and target variable (y)
-        X = data[['Number', 'Date']].values
-        y = data['Rate'].values
+        X = data[['Number', 'Date']].values.astype(float)
+        y = data['Rate'].values.astype(float)
 
         # Split the data into training and testing sets
         X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
