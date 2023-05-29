@@ -1,92 +1,70 @@
 import streamlit as st
-import mxnet as mx
 import pandas as pd
+from pybrain.structure import FeedForwardNetwork, LinearLayer, SigmoidLayer, FullConnection
+from pybrain.supervised.trainers import BackpropTrainer
+from pybrain.datasets import SupervisedDataSet
+from datetime import datetime
 
-# Load historical exchange rate data from CSV file
+# Load historical exchange rate data from a CSV file
+@st.cache
 def load_data(file_path):
-    df = pd.read_csv(file_path)
-    return df
+    data = pd.read_csv(file_path)
+    return data
 
-# Preprocess the data
-def preprocess_data(df):
-    # Normalize the exchange rates
-    rates = df['Rate'].values
-    min_rate = min(rates)
-    max_rate = max(rates)
-    normalized_rates = (rates - min_rate) / (max_rate - min_rate)
-    df['Normalized Rate'] = normalized_rates
+# Prepare data for training the neural network
+def prepare_data(data):
+    ds = SupervisedDataSet(1, 1)
+    for i in range(len(data)):
+        ds.addSample(data['Number'][i], data['Rate'][i])
+    return ds
 
-    # Convert the date column to datetime format
-    df['Date'] = pd.to_datetime(df['Date'])
+# Train the neural network
+def train_network(ds):
+    net = FeedForwardNetwork()
+    in_layer = LinearLayer(1)
+    hidden_layer = SigmoidLayer(3)
+    out_layer = LinearLayer(1)
+    net.addInputModule(in_layer)
+    net.addModule(hidden_layer)
+    net.addOutputModule(out_layer)
+    in_to_hidden = FullConnection(in_layer, hidden_layer)
+    hidden_to_out = FullConnection(hidden_layer, out_layer)
+    net.addConnection(in_to_hidden)
+    net.addConnection(hidden_to_out)
+    net.sortModules()
+    trainer = BackpropTrainer(net, ds)
+    trainer.trainEpochs(1000)
+    return net
 
-    return df
-
-# Build and train the MXNet neural network model
-def build_model():
-    net = mx.gluon.nn.Sequential()
-    net.add(mx.gluon.nn.Dense(10, activation='relu'))
-    net.add(mx.gluon.nn.Dense(1))
-    net.initialize()
-    loss_function = mx.gluon.loss.L2Loss()
-    optimizer = mx.gluon.Trainer(net.collect_params(), 'adam')
-    return net, loss_function, optimizer
-
-# Train the model using historical data
-def train_model(net, loss_function, optimizer, X_train, y_train, epochs=10, batch_size=32):
-    dataset = mx.gluon.data.ArrayDataset(X_train, y_train)
-    dataloader = mx.gluon.data.DataLoader(dataset, batch_size=batch_size, shuffle=True)
-    
-    for epoch in range(epochs):
-        cumulative_loss = 0
-        for X, y in dataloader:
-            with mx.autograd.record():
-                output = net(X)
-                loss = loss_function(output, y)
-            loss.backward()
-            optimizer.step(batch_size)
-            cumulative_loss += mx.nd.sum(loss).asscalar()
-        epoch_loss = cumulative_loss / len(X_train)
-        st.write(f"Epoch {epoch+1}/{epochs}, Loss: {epoch_loss}")
-
-# Make predictions using the trained model
-def make_predictions(net, X_test):
-    predictions = net(X_test)
-    return predictions
+# Predict exchange rate using the trained network
+def predict_rate(net, input_data):
+    output = net.activate(input_data)
+    return output
 
 # Main function
 def main():
     st.title("Exchange Rate Prediction")
-    
-    # File upload
-    file = st.file_uploader("Upload CSV file", type="csv")
-    
-    if file is not None:
-        df = load_data(file.name)
-        df = preprocess_data(df)
-        
-        st.subheader("Data")
-        st.write(df)
-        
-        # Prepare training data
-        X_train = df['Number'].values.reshape(-1, 1)
-        y_train = df['Normalized Rate'].values.reshape(-1, 1)
-        
-        # Build and train the model
-        net, loss_function, optimizer = build_model()
-        train_model(net, loss_function, optimizer, X_train, y_train)
-        
-        # Make predictions
-        X_test = X_train
-        predictions = make_predictions(net, X_test)
-        
-        # Denormalize predictions
-        min_rate = df['Rate'].min()
-        max_rate = df['Rate'].max()
-        denormalized_predictions = predictions * (max_rate - min_rate) + min_rate
-        
-        # Display predictions
-        st.subheader("Predictions")
-        st.write(pd.DataFrame({'Number': X_test.flatten(), 'Prediction': denormalized_predictions.flatten()}))
+
+    # Load historical data from CSV
+    file_path = st.file_uploader("Upload a CSV file", type="csv")
+    if file_path is not None:
+        data = load_data(file_path)
+        st.write("Historical Data:")
+        st.write(data)
+
+        # Prepare data for training
+        ds = prepare_data(data)
+
+        # Train the neural network
+        net = train_network(ds)
+
+        # Prediction
+        st.write("Prediction:")
+        number = st.number_input("Enter a number:")
+        prediction = predict_rate(net, number)
+        st.write(f"Predicted rate: {prediction[0]:.2f}")
+    else:
+        st.write("Please upload a CSV file.")
 
 if __name__ == '__main__':
     main()
