@@ -1,8 +1,6 @@
 import streamlit as st
 import pandas as pd
-from pybrain.structure import FeedForwardNetwork
-from pybrain.structure import LinearLayer, SigmoidLayer
-from pybrain.structure import FullConnection
+from pybrain.tools.shortcuts import buildNetwork
 from pybrain.supervised.trainers import BackpropTrainer
 from pybrain.datasets import SupervisedDataSet
 
@@ -24,26 +22,7 @@ def build_model():
     n_outputs = 1  # Number of output units (predicted rate)
 
     # Create a feed-forward neural network
-    network = FeedForwardNetwork()
-
-    # Add layers to the network
-    input_layer = LinearLayer(n_inputs)
-    hidden_layer = SigmoidLayer(n_hidden)
-    output_layer = LinearLayer(n_outputs)
-
-    network.addInputModule(input_layer)
-    network.addModule(hidden_layer)
-    network.addOutputModule(output_layer)
-
-    # Connect the layers
-    input_to_hidden = FullConnection(input_layer, hidden_layer)
-    hidden_to_output = FullConnection(hidden_layer, output_layer)
-
-    network.addConnection(input_to_hidden)
-    network.addConnection(hidden_to_output)
-
-    # Initialize the network
-    network.sortModules()
+    network = buildNetwork(n_inputs, n_hidden, n_outputs)
 
     return network
 
