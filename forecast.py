@@ -1,93 +1,75 @@
 import streamlit as st
+import torch
+import torch.nn as nn
 import pandas as pd
 import numpy as np
-from pybrain.structure import FeedForwardNetwork
-from pybrain.structure import LinearLayer, SigmoidLayer
-from pybrain.structure import FullConnection
-from sklearn.preprocessing import MinMaxScaler
+
 
 # Load historical exchange rate data from CSV file
 def load_data(filename):
     data = pd.read_csv(filename)
     return data
 
-# Create a PyBrain model for exchange rate prediction
-def create_model():
-    model = FeedForwardNetwork()
-    
-    input_layer = LinearLayer(1)
-    hidden_layer = SigmoidLayer(50)
-    output_layer = LinearLayer(1)
-    
-    model.addInputModule(input_layer)
-    model.addModule(hidden_layer)
-    model.addOutputModule(output_layer)
-    
-    input_to_hidden = FullConnection(input_layer, hidden_layer)
-    hidden_to_output = FullConnection(hidden_layer, output_layer)
-    
-    model.addConnection(input_to_hidden)
-    model.addConnection(hidden_to_output)
-    
-    model.sortModules()
-    
+
+# Define the neural network model using PyTorch
+class ExchangeRatePredictor(nn.Module):
+    def __init__(self):
+        super(ExchangeRatePredictor, self).__init__()
+        self.fc1 = nn.Linear(1, 10)
+        self.relu = nn.ReLU()
+        self.fc2 = nn.Linear(10, 1)
+
+    def forward(self, x):
+        x = self.fc1(x)
+        x = self.relu(x)
+        x = self.fc2(x)
+        return x
+
+
+# Preprocess the data for training the neural network
+def preprocess_data(data):
+    # Normalize the data
+    data['Rate'] = (data['Rate'] - data['Rate'].mean()) / data['Rate'].std()
+    return data
+
+# Train the neural network
+def train_model(data):
+    model = ExchangeRatePredictor()
+    criterion = nn.MSELoss()
+    optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
+
+    x = torch.Tensor(data['Number'].values).unsqueeze(1)
+    y = torch.Tensor(data['Rate'].values).unsqueeze(1)
+
+    for epoch in range(1000):
+        optimizer.zero_grad()
+        outputs = model(x)
+        loss = criterion(outputs, y)
+        loss.backward()
+        optimizer.step()
+
     return model
 
-# Train the PyBrain model
-def train_model(model, data):
-    scaler = MinMaxScaler(feature_range=(0, 1))
-    scaled_data = scaler.fit_transform(data)
-    
-    x_train = []
-    y_train = []
-    for i in range(1, len(scaled_data)):
-        x_train.append(scaled_data[i-1:i])
-        y_train.append(scaled_data[i])
-    
-    x_train, y_train = np.array(x_train), np.array(y_train)
-    x_train = x_train.reshape(x_train.shape[0], 1)
-    y_train = y_train.reshape(y_train.shape[0], 1)
-    
-    for epoch in range(20):
-        for i in range(len(x_train)):
-            model.activate(x_train[i])
-            model.backActivate(y_train[i])
-    
 # Predict the exchange rate using the trained model
-def predict_rate(model, data):
-    scaler = MinMaxScaler(feature_range=(0, 1))
-    scaled_data = scaler.fit_transform(data)
-    
-    x_test = np.array([scaled_data[-1]])
-    x_test = x_test.reshape(x_test.shape[0], 1)
-    
-    predicted_rate = model.activate(x_test)
-    predicted_rate = scaler.inverse_transform(predicted_rate)
-    return predicted_rate[0][0]
+def predict_rate(model, rate):
+    x = torch.Tensor([rate])
+    prediction = model(x)
+    return prediction.item()
 
-# Main function
+# Streamlit application
 def main():
     st.title('Exchange Rate Prediction')
-    
-    # Upload historical data file
-    uploaded_file = st.file_uploader('Upload CSV file', type=['csv'])
-    
-    if uploaded_file is not None:
-        data = load_data(uploaded_file)
-        
-        st.subheader('Historical Data')
-        st.dataframe(data)  # Display all loaded values
-        
-        model = create_model()
-        
-        st.subheader('Train Model')
-        train_model(model, data['Rate'].values.reshape(-1, 1))
-        st.write('Model training complete.')
-        
-        st.subheader('Exchange Rate Prediction')
-        prediction = predict_rate(model, data['Rate'].values.reshape(-1, 1))
-        st.write('Predicted exchange rate:', prediction)
+    st.write('Upload the historical exchange rate data file (CSV format):')
+    file = st.file_uploader('Upload CSV file', type=['csv'])
 
-# Run the application
+    if file is not None:
+        data = load_data(file)
+        data = preprocess_data(data)
+        model = train_model(data)
+        last_rate = data['Rate'].values[-1]
+        prediction = predict_rate(model, last_rate)
+        prediction_denormalized = prediction * data['Rate'].std() + data['Rate'].mean()
+        st.write(f'The predicted exchange rate for the next time step is: {prediction_denormalized}')
+
 if __name__ == '__main__':
     main()
