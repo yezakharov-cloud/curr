@@ -1,76 +1,99 @@
 import streamlit as st
 import pandas as pd
-import numpy as np
-import tensorflow as tf
-from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import Dense, LSTM
-from sklearn.preprocessing import MinMaxScaler
+from pybrain.structure import FeedForwardNetwork
+from pybrain.structure import LinearLayer, SigmoidLayer
+from pybrain.structure import FullConnection
+from pybrain.supervised.trainers import BackpropTrainer
+from pybrain.datasets import SupervisedDataSet
 
-# Load historical exchange rate data from CSV file
-def load_data(filename):
-    data = pd.read_csv(filename)
+# Load historical data from CSV file
+def load_data(file_path):
+    data = pd.read_csv(file_path)
     return data
 
-# Create a LSTM model for exchange rate prediction
-def create_model():
-    model = Sequential()
-    model.add(LSTM(units=50, return_sequences=True, input_shape=(1, 1)))
-    model.add(LSTM(units=50))
-    model.add(Dense(units=1))
-    model.compile(optimizer='adam', loss='mean_squared_error')
-    return model
+# Preprocess the data
+def preprocess_data(data):
+    # Perform any necessary preprocessing steps
+    # e.g., data normalization, feature engineering, etc.
+    return data
 
-# Train the LSTM model
-def train_model(model, data):
-    scaler = MinMaxScaler(feature_range=(0, 1))
-    scaled_data = scaler.fit_transform(data)
-    
-    x_train = []
-    y_train = []
-    for i in range(1, len(scaled_data)):
-        x_train.append(scaled_data[i-1:i])
-        y_train.append(scaled_data[i])
-    
-    x_train, y_train = np.array(x_train), np.array(y_train)
-    x_train = np.reshape(x_train, (x_train.shape[0], x_train.shape[1], 1))
-    
-    model.fit(x_train, y_train, epochs=20, batch_size=1, verbose=2)
+# Build PyBrain neural network model
+def build_model():
+    n_inputs = 1  # Number of input features (e.g., historical rates)
+    n_hidden = 10  # Number of hidden units in the neural network
+    n_outputs = 1  # Number of output units (predicted rate)
 
-# Predict the exchange rate using the trained model
-def predict_rate(model, data):
-    scaler = MinMaxScaler(feature_range=(0, 1))
-    scaled_data = scaler.fit_transform(data)
-    
-    x_test = np.array([scaled_data[-1]])
-    x_test = np.reshape(x_test, (x_test.shape[0], x_test.shape[1], 1))
-    
-    predicted_rate = model.predict(x_test)
-    predicted_rate = scaler.inverse_transform(predicted_rate)
-    return predicted_rate[0][0]
+    # Create a feed-forward neural network
+    network = FeedForwardNetwork()
 
-# Main function
+    # Add layers to the network
+    input_layer = LinearLayer(n_inputs)
+    hidden_layer = SigmoidLayer(n_hidden)
+    output_layer = LinearLayer(n_outputs)
+
+    network.addInputModule(input_layer)
+    network.addModule(hidden_layer)
+    network.addOutputModule(output_layer)
+
+    # Connect the layers
+    input_to_hidden = FullConnection(input_layer, hidden_layer)
+    hidden_to_output = FullConnection(hidden_layer, output_layer)
+
+    network.addConnection(input_to_hidden)
+    network.addConnection(hidden_to_output)
+
+    # Initialize the network
+    network.sortModules()
+
+    return network
+
+# Train the PyBrain neural network model
+def train_model(network, data):
+    X = data["Number"].values  # Input features
+    y = data["Rate"].values  # Target variable (rate)
+
+    # Create a SupervisedDataSet for training
+    dataset = SupervisedDataSet(1, 1)
+    for i in range(len(X)):
+        dataset.addSample(X[i], y[i])
+
+    # Train the network using Backpropagation algorithm
+    trainer = BackpropTrainer(network, dataset)
+    trainer.train()
+
+# Predict currency rates using the trained model
+def predict_rates(network, input_data):
+    predictions = []
+    for input_value in input_data:
+        output_value = network.activate([input_value])
+        predictions.append(output_value[0])
+    return predictions
+
+# Main Streamlit application
 def main():
-    st.title('Exchange Rate Prediction')
-    
-    # Upload historical data file
-    uploaded_file = st.file_uploader('Upload CSV file', type=['csv'])
-    
-    if uploaded_file is not None:
-        data = load_data(uploaded_file)
-        
-        st.subheader('Historical Data')
-        st.dataframe(data)  # Display all loaded values
-        
-        model = create_model()
-        
-        st.subheader('Train Model')
-        train_model(model, data['Rate'].values.reshape(-1, 1))
-        st.write('Model training complete.')
-        
-        st.subheader('Exchange Rate Prediction')
-        prediction = predict_rate(model, data['Rate'].values.reshape(-1, 1))
-        st.write('Predicted exchange rate:', prediction)
+    st.title("Currency Rate Prediction")
+    st.sidebar.title("Settings")
 
-# Run the application
-if __name__ == '__main__':
+    # Load historical data from CSV file
+    file_path = st.sidebar.file_uploader("Upload CSV file", type="csv")
+    if file_path is not None:
+        data = load_data(file_path)
+        data = preprocess_data(data)
+
+        # Build and train the model
+        model = build_model()
+        train_model(model, data)
+
+        # Get input values for prediction
+        input_values = st.sidebar.text_input("Enter input values (comma-separated)")
+
+        if input_values:
+            input_data = [float(x.strip()) for x in input_values.split(",")]
+            predictions = predict_rates(model, input_data)
+
+            st.subheader("Prediction Results")
+            for i in range(len(input_data)):
+                st.write(f"Input: {input_data[i]}, Prediction: {predictions[i]}")
+
+if __name__ == "__main__":
     main()
