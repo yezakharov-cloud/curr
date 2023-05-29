@@ -77,8 +77,8 @@ def main():
         X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
         # Convert the data to MXNet NDArray format
-        X_train = ndarray.array(X_train)
-        y_train = ndarray.array(y_train)
+        X_train = ndarray.array(X_train, ctx=mx.cpu())
+        y_train = ndarray.array(y_train, ctx=mx.cpu())
 
         # Build the neural network model
         input_dim = X_train.shape[1]
@@ -89,8 +89,16 @@ def main():
         train_model(model, X_train, y_train)
 
         # Convert the test data to MXNet NDArray format
-        X_test = ndarray.array(X_test)
+        X_test = ndarray.array(X_test, ctx=mx.cpu())
 
-        # Make predictions
-        predictions = predict(model, X_test)
+# Make predictions
+predictions = predict(model, X_test)
+
+# Display the predictions
+st.write("Exchange Rate Predictions:")
+st.write(pd.DataFrame({'Actual Rate': y_test, 'Predicted Rate': predictions}))
+
+# Run the Streamlit app
+if __name__ == '__main__':
+    main()
 
