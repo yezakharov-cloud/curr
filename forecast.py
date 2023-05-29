@@ -1,76 +1,75 @@
+import streamlit as st
+import torch
+import torch.nn as nn
 import pandas as pd
 import numpy as np
-from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import MinMaxScaler
-import streamlit as st
-from tensorflow import keras
-from tensorflow.keras import layers
 
-# Load the historical exchange rate data from a CSV file
-def load_data(file_path):
-    data = pd.read_csv(file_path)
+
+# Load historical exchange rate data from CSV file
+def load_data(filename):
+    data = pd.read_csv(filename)
     return data
 
-# Preprocess the data
+
+# Define the neural network model using PyTorch
+class ExchangeRatePredictor(nn.Module):
+    def __init__(self):
+        super(ExchangeRatePredictor, self).__init__()
+        self.fc1 = nn.Linear(1, 10)
+        self.relu = nn.ReLU()
+        self.fc2 = nn.Linear(10, 1)
+
+    def forward(self, x):
+        x = self.fc1(x)
+        x = self.relu(x)
+        x = self.fc2(x)
+        return x
+
+
+# Preprocess the data for training the neural network
 def preprocess_data(data):
-    # Scale the exchange rate values to a range between 0 and 1
-    scaler = MinMaxScaler()
-    data['Rate'] = scaler.fit_transform(data['Rate'].values.reshape(-1, 1))
-
-    # Convert the date to numerical representation
-    data['Date'] = pd.to_datetime(data['Date'])
-    data['Date'] = (data['Date'] - data['Date'].min()).dt.days
-
+    # Normalize the data
+    data['Rate'] = (data['Rate'] - data['Rate'].mean()) / data['Rate'].std()
     return data
 
-# Build the neural network model using Keras
-def build_model(input_dim):
-    model = keras.Sequential([
-        layers.Dense(64, activation='relu', input_dim=input_dim),
-        layers.Dense(1)
-    ])
+# Train the neural network
+def train_model(data):
+    model = ExchangeRatePredictor()
+    criterion = nn.MSELoss()
+    optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
+
+    x = torch.Tensor(data['Number'].values).unsqueeze(1)
+    y = torch.Tensor(data['Rate'].values).unsqueeze(1)
+
+    for epoch in range(1000):
+        optimizer.zero_grad()
+        outputs = model(x)
+        loss = criterion(outputs, y)
+        loss.backward()
+        optimizer.step()
+
     return model
 
-# Train the model
-def train_model(model, X_train, y_train):
-    model.compile(optimizer='adam', loss='mean_squared_error')
-    model.fit(X_train, y_train, epochs=50, batch_size=32, verbose=0)
+# Predict the exchange rate using the trained model
+def predict_rate(model, rate):
+    x = torch.Tensor([rate])
+    prediction = model(x)
+    return prediction.item()
 
-# Make predictions using the trained model
-def predict(model, X):
-    return model.predict(X).flatten()
-
-# Main function
+# Streamlit application
 def main():
-    # Set Streamlit app title and layout
-    st.title("Exchange Rate Prediction")
-    st.sidebar.title("Options")
+    st.title('Exchange Rate Prediction')
+    st.write('Upload the historical exchange rate data file (CSV format):')
+    file = st.file_uploader('Upload CSV file', type=['csv'])
 
-    # Load and preprocess the data
-    file_path = st.sidebar.file_uploader("Upload CSV file", type="csv")
-
-    if file_path is not None:
-        data = load_data(file_path)
+    if file is not None:
+        data = load_data(file)
         data = preprocess_data(data)
+        model = train_model(data)
+        last_rate = data['Rate'].values[-1]
+        prediction = predict_rate(model, last_rate)
+        prediction_denormalized = prediction * data['Rate'].std() + data['Rate'].mean()
+        st.write(f'The predicted exchange rate for the next time step is: {prediction_denormalized}')
 
-        # Split the data into input features (X) and target variable (y)
-        y = data[['Number', 'Date']].values.astype(float)
-        X = data['Rate'].values.astype(float)
-
-        # Build the neural network model
-        input_dim = X.shape[1]
-        model = build_model(input_dim)
-
-        # Train the model
-        train_model(model, X, y)
-
-        # Make predictions on the loaded data
-        predictions = predict(model, X)
-
-        # Display the predictions
-        st.write("Exchange Rate Predictions:")
-        st.write(pd.DataFrame({'Rate': data['Rate'], 'Predicted Rate': predictions}))
-
-# Run the Streamlit app
 if __name__ == '__main__':
     main()
