@@ -54,8 +54,8 @@ def main():
         data = preprocess_data(data)
 
         # Split the data into input features (X) and target variable (y)
-        X = data[['Number', 'Date']].values.astype(float)
-        y = data['Rate'].values.astype(float)
+        y = data[['Number', 'Date']].values.astype(float)
+        X = data['Rate'].values.astype(float)
 
         # Build the neural network model
         input_dim = X.shape[1]
