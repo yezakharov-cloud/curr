@@ -38,8 +38,8 @@ def train_model(data):
     criterion = nn.MSELoss()
     optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
 
-    x = torch.Tensor(data['Number'].values).unsqueeze(1)
-    y = torch.Tensor(data['Rate'].values).unsqueeze(1)
+    y = torch.Tensor(data['Number'].values).unsqueeze(1)
+    x = torch.Tensor(data['Rate'].values).unsqueeze(1)
 
     for epoch in range(1000):
         optimizer.zero_grad()
