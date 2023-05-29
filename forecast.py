@@ -20,8 +20,8 @@ class ExchangeRateModel(nn.Module):
 
     def forward(self, x):
         output, _ = self.lstm1(x)
-        output, _ = self.lstm2(output[:, -1:, :])
-        output = self.fc(output[:, -1, :])  # Remove extra dimension from indexing
+        output, _ = self.lstm2(output[:, -1, :])  # Fix indexing
+        output = self.fc(output[:, -1, :])  # Fix indexing
         return output
 
 # Train the PyTorch model
