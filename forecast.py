@@ -1,79 +1,92 @@
 import streamlit as st
+import mxnet as mx
 import pandas as pd
-from pybrain.tools.shortcuts import buildNetwork
-from pybrain.supervised.trainers import BackpropTrainer
-from pybrain.datasets import SupervisedDataSet
 
-
-# Load historical data from CSV file
+# Load historical exchange rate data from CSV file
 def load_data(file_path):
-    data = pd.read_csv(file_path)
-    return data
+    df = pd.read_csv(file_path)
+    return df
 
 # Preprocess the data
-def preprocess_data(data):
-    # Perform any necessary preprocessing steps
-    # e.g., data normalization, feature engineering, etc.
-    return data
+def preprocess_data(df):
+    # Normalize the exchange rates
+    rates = df['Rate'].values
+    min_rate = min(rates)
+    max_rate = max(rates)
+    normalized_rates = (rates - min_rate) / (max_rate - min_rate)
+    df['Normalized Rate'] = normalized_rates
 
-# Build PyBrain neural network model
+    # Convert the date column to datetime format
+    df['Date'] = pd.to_datetime(df['Date'])
+
+    return df
+
+# Build and train the MXNet neural network model
 def build_model():
-    n_inputs = 1  # Number of input features (e.g., historical rates)
-    n_hidden = 10  # Number of hidden units in the neural network
-    n_outputs = 1  # Number of output units (predicted rate)
+    net = mx.gluon.nn.Sequential()
+    net.add(mx.gluon.nn.Dense(10, activation='relu'))
+    net.add(mx.gluon.nn.Dense(1))
+    net.initialize()
+    loss_function = mx.gluon.loss.L2Loss()
+    optimizer = mx.gluon.Trainer(net.collect_params(), 'adam')
+    return net, loss_function, optimizer
 
-    # Create a feed-forward neural network
-    network = buildNetwork(n_inputs, n_hidden, n_outputs)
+# Train the model using historical data
+def train_model(net, loss_function, optimizer, X_train, y_train, epochs=10, batch_size=32):
+    dataset = mx.gluon.data.ArrayDataset(X_train, y_train)
+    dataloader = mx.gluon.data.DataLoader(dataset, batch_size=batch_size, shuffle=True)
+    
+    for epoch in range(epochs):
+        cumulative_loss = 0
+        for X, y in dataloader:
+            with mx.autograd.record():
+                output = net(X)
+                loss = loss_function(output, y)
+            loss.backward()
+            optimizer.step(batch_size)
+            cumulative_loss += mx.nd.sum(loss).asscalar()
+        epoch_loss = cumulative_loss / len(X_train)
+        st.write(f"Epoch {epoch+1}/{epochs}, Loss: {epoch_loss}")
 
-    return network
-
-# Train the PyBrain neural network model
-def train_model(network, data):
-    X = data["Number"].values  # Input features
-    y = data["Rate"].values  # Target variable (rate)
-
-    # Create a SupervisedDataSet for training
-    dataset = SupervisedDataSet(1, 1)
-    for i in range(len(X)):
-        dataset.addSample(X[i], y[i])
-
-    # Train the network using Backpropagation algorithm
-    trainer = BackpropTrainer(network, dataset)
-    trainer.train()
-
-# Predict currency rates using the trained model
-def predict_rates(network, input_data):
-    predictions = []
-    for input_value in input_data:
-        output_value = network.activate([input_value])
-        predictions.append(output_value[0])
+# Make predictions using the trained model
+def make_predictions(net, X_test):
+    predictions = net(X_test)
     return predictions
 
-# Main Streamlit application
+# Main function
 def main():
-    st.title("Currency Rate Prediction")
-    st.sidebar.title("Settings")
-
-    # Load historical data from CSV file
-    file_path = st.sidebar.file_uploader("Upload CSV file", type="csv")
-    if file_path is not None:
-        data = load_data(file_path)
-        data = preprocess_data(data)
-
+    st.title("Exchange Rate Prediction")
+    
+    # File upload
+    file = st.file_uploader("Upload CSV file", type="csv")
+    
+    if file is not None:
+        df = load_data(file.name)
+        df = preprocess_data(df)
+        
+        st.subheader("Data")
+        st.write(df)
+        
+        # Prepare training data
+        X_train = df['Number'].values.reshape(-1, 1)
+        y_train = df['Normalized Rate'].values.reshape(-1, 1)
+        
         # Build and train the model
-        model = build_model()
-        train_model(model, data)
+        net, loss_function, optimizer = build_model()
+        train_model(net, loss_function, optimizer, X_train, y_train)
+        
+        # Make predictions
+        X_test = X_train
+        predictions = make_predictions(net, X_test)
+        
+        # Denormalize predictions
+        min_rate = df['Rate'].min()
+        max_rate = df['Rate'].max()
+        denormalized_predictions = predictions * (max_rate - min_rate) + min_rate
+        
+        # Display predictions
+        st.subheader("Predictions")
+        st.write(pd.DataFrame({'Number': X_test.flatten(), 'Prediction': denormalized_predictions.flatten()}))
 
-        # Get input values for prediction
-        input_values = st.sidebar.text_input("Enter input values (comma-separated)")
-
-        if input_values:
-            input_data = [float(x.strip()) for x in input_values.split(",")]
-            predictions = predict_rates(model, input_data)
-
-            st.subheader("Prediction Results")
-            for i in range(len(input_data)):
-                st.write(f"Input: {input_data[i]}, Prediction: {predictions[i]}")
-
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()
