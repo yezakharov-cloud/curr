@@ -1,66 +1,93 @@
+import pandas as pd
+import numpy as np
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import MinMaxScaler
 import streamlit as st
-import mxnet as mx
-from mxnet import gluon, autograd, nd
-from mxnet.gluon import nn, Trainer
+from cntk import input_variable, relu, training_session, Trainer, learning_rate_schedule, UnitType
+from cntk.layers import Dense
+from cntk.ops import squared_error
 
-# Define the neural network model using MXNet
-class ExchangeRatePredictor(nn.Block):
-    def __init__(self):
-        super(ExchangeRatePredictor, self).__init__()
-        self.fc = nn.Dense(10, activation='relu')
-        self.output = nn.Dense(1)
-
-    def forward(self, x):
-        x = self.fc(x)
-        return self.output(x)
-
-# Load historical exchange rate data from a CSV file
+# Load the historical exchange rate data from a CSV file
 def load_data(file_path):
-    data = mx.ndarray.loadtxt(file_path, delimiter=',', skiprows=1)
-    return data[:, :-1], data[:, -1]
+    data = pd.read_csv(file_path)
+    return data
 
-# Preprocess the data for training the neural network
+# Preprocess the data
 def preprocess_data(data):
-    # Normalize the data
-    mean = data.mean(axis=0)
-    std = data.std(axis=0)
-    data = (data - mean) / std
-    return data, mean, std
+    # Convert dates to numerical values
+    data['Date'] = pd.to_datetime(data['Date'])
+    data['Date'] = data['Date'].map(pd.Timestamp.to_julian_date)
+    
+    # Scale the exchange rate values to a range between 0 and 1
+    scaler = MinMaxScaler()
+    data['Rate'] = scaler.fit_transform(data['Rate'].values.reshape(-1, 1))
+    
+    return data
 
-# Train the neural network
-def train_model(data, labels):
-    model = ExchangeRatePredictor()
-    criterion = gluon.loss.L2Loss()
-    trainer = Trainer(model.collect_params(), 'adam', {'learning_rate': 0.001})
+# Build the neural network model using Microsoft CNTK
+def build_model(input_dim):
+    input_var = input_variable(input_dim)
+    hidden_layer = Dense(64, activation=relu)(input_var)
+    output_layer = Dense(1)(hidden_layer)
+    return output_layer
 
-    for epoch in range(1000):
-        with autograd.record():
-            output = model(data)
-            loss = criterion(output, labels)
-        loss.backward()
-        trainer.step(data.shape[0])
-
+# Train the model
+def train_model(model, X_train, y_train):
+    learning_rate = learning_rate_schedule(0.1, UnitType.minibatch)
+    loss = squared_error(model, y_train)
+    learner = Trainer(model, loss, learning_rate)
+    batch_size = 32
+    num_epochs = 50
+    for epoch in range(num_epochs):
+        for i in range(0, len(X_train), batch_size):
+            x_batch = X_train[i:i+batch_size]
+            y_batch = y_train[i:i+batch_size]
+            learner.train_minibatch({model.arguments[0]: x_batch, loss.arguments[0]: y_batch})
     return model
 
-# Predict the exchange rate using the trained model
-def predict_rate(model, data, mean, std):
-    data = (data - mean) / std
-    output = model(data)
-    return output * std[-1] + mean[-1]
+# Make predictions using the trained model
+def predict(model, X_test):
+    return model.eval({model.arguments[0]: X_test})
 
-# Streamlit application
+# Main function
 def main():
-    st.title('Exchange Rate Prediction')
-    st.write('Upload the historical exchange rate data file (CSV format):')
-    file = st.file_uploader('Choose a CSV file', type='csv')
+    # Set Streamlit app title and layout
+    st.title("Exchange Rate Prediction")
+    st.sidebar.title("Options")
+    
+    # Load and preprocess the data
+    file_path = st.sidebar.file_uploader("Upload CSV file", type="csv")
+    
+    if file_path is not None:
+        data = load_data(file_path)
+        data = preprocess_data(data)
+        
+        # Split the data into input features (X) and target variable (y)
+        X = data[['Number', 'Date']].values
+        y = data['Rate'].values
+        
+        # Split the data into training and testing sets
+        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+        
+        # Build the neural network model
+        input_dim = X_train.shape[1]
+        model = build_model(input_dim)
+        
+        # Train the model
+        model = train_model(model, X_train, y_train)
+        
+        # Make predictions
+        predictions = predict(model, X_test)
+        
+        # Inverse scale the predictions
+        scaler = MinMaxScaler()
+        scaler.fit(data['Rate'].values.reshape(-1, 1))
+        predictions = scaler.inverse_transform(predictions)
+        
+        # Display predicted exchange rates
+        st.write("Predicted Exchange Rates:")
+        st.write(predictions)
+    else:
+        st.sidebar.write("Please upload a CSV file.")
 
-    if file is not None:
-        data, labels = load_data(file.name)
-        data, mean, std = preprocess_data(data)
-        model = train_model(data, labels)
-        last_data = nd.array(data[-1])
-        prediction = predict_rate(model, last_data, mean, std)
-        st.write(f'The predicted exchange rate for the next time step is: {prediction.asscalar()}')
-
-if __name__ == '__main__':
-    main()
+#
