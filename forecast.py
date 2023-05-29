@@ -4,6 +4,12 @@ import torch.nn as nn
 import pandas as pd
 import numpy as np
 
+# Load historical exchange rate data from a CSV file
+def load_data(file_path):
+    data = pd.read_csv(file_path)
+    return data
+
+
 # Define the neural network model using PyTorch
 class ExchangeRatePredictor(nn.Module):
     def __init__(self):
@@ -17,12 +23,6 @@ class ExchangeRatePredictor(nn.Module):
         x = self.relu(x)
         x = self.fc2(x)
         return x
-
-# Load historical exchange rate data from a CSV file
-def load_data(file_path):
-    data = pd.read_csv(file_path)
-    return data
-
 # Preprocess the data for training the neural network
 def preprocess_data(data):
     # Normalize the data
