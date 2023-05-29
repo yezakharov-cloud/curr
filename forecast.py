@@ -59,7 +59,7 @@ def main():
     file = st.file_uploader('Upload CSV file', type=['csv'])
 
     if file is not None:
-        data = load_data(uploaded_file)
+        data = load_data(file)
         data = preprocess_data(data)
         model = train_model(data)
         last_number = data['Number'].values[-1]
