@@ -1,5 +1,6 @@
 pybrain
 keras
+cntk
 mxnet
 tensorflow-cpu
 keybert==0.6.0
