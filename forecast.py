@@ -3,6 +3,7 @@ import torch
 import torch.nn as nn
 import pandas as pd
 
+
 # Define the neural network model using PyTorch
 class ExchangeRatePredictor(nn.Module):
     def __init__(self):
