@@ -4,10 +4,12 @@ import torch.nn as nn
 import pandas as pd
 import numpy as np
 
+
 # Load historical exchange rate data from CSV file
 def load_data(filename):
     data = pd.read_csv(filename)
     return data
+
 
 # Define the neural network model using PyTorch
 class ExchangeRatePredictor(nn.Module):
@@ -22,6 +24,8 @@ class ExchangeRatePredictor(nn.Module):
         x = self.relu(x)
         x = self.fc2(x)
         return x
+
+
 # Preprocess the data for training the neural network
 def preprocess_data(data):
     # Normalize the data
@@ -47,8 +51,8 @@ def train_model(data):
     return model
 
 # Predict the exchange rate using the trained model
-def predict_rate(model, number):
-    x = torch.Tensor([number])
+def predict_rate(model, rate):
+    x = torch.Tensor([rate])
     prediction = model(x)
     return prediction.item()
 
@@ -62,9 +66,10 @@ def main():
         data = load_data(file)
         data = preprocess_data(data)
         model = train_model(data)
-        last_number = data['Number'].values[-1]
-        prediction = predict_rate(model, last_number + 1)
-        st.write(f'The predicted exchange rate for the next time step is: {prediction * data["Rate"].std() + data["Rate"].mean()}')
+        last_rate = data['Rate'].values[-1]
+        prediction = predict_rate(model, last_rate)
+        prediction_denormalized = prediction * data['Rate'].std() + data['Rate'].mean()
+        st.write(f'The predicted exchange rate for the next time step is: {prediction_denormalized}')
 
 if __name__ == '__main__':
     main()
