@@ -59,7 +59,7 @@ def main():
     file_path = st.text_input('File Path')
     
     if st.button('Predict'):
-        data = load_data(file_path)
+        data = load_data(uploaded_file)
         data = preprocess_data(data)
         model = train_model(data)
         last_number = data['Number'].values[-1]
