@@ -2,7 +2,7 @@ import streamlit as st
 import torch
 import torch.nn as nn
 import pandas as pd
-
+import numpy as np
 
 # Load historical exchange rate data from CSV file
 def load_data(filename):
