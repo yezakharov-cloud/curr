@@ -3,10 +3,8 @@ import numpy as np
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import MinMaxScaler
 import streamlit as st
-import mxnet as mx
-from mxnet import gluon, autograd, ndarray
-from mxnet.gluon import nn, Trainer
-from mxnet.gluon.loss import L2Loss
+from tensorflow import keras
+from tensorflow.keras import layers
 
 # Load the historical exchange rate data from a CSV file
 def load_data(file_path):
@@ -15,46 +13,28 @@ def load_data(file_path):
 
 # Preprocess the data
 def preprocess_data(data):
-    # Convert dates to numerical values
-    data['Date'] = pd.to_datetime(data['Date'])
-    data['Date'] = data['Date'].map(pd.Timestamp.to_julian_date)
-
     # Scale the exchange rate values to a range between 0 and 1
     scaler = MinMaxScaler()
     data['Rate'] = scaler.fit_transform(data['Rate'].values.reshape(-1, 1))
 
     return data
 
-# Build the neural network model using MXNet
+# Build the neural network model using Keras
 def build_model(input_dim):
-    net = nn.Sequential()
-    with net.name_scope():
-        net.add(nn.Dense(64, activation='relu'))
-        net.add(nn.Dense(1))
-    return net
+    model = keras.Sequential([
+        layers.Dense(64, activation='relu', input_dim=input_dim),
+        layers.Dense(1)
+    ])
+    return model
 
 # Train the model
 def train_model(model, X_train, y_train):
-    loss = L2Loss()
-    trainer = Trainer(model.collect_params(), 'adam')
-    num_epochs = 50
-    batch_size = 32
-    train_data = gluon.data.DataLoader(gluon.data.ArrayDataset(X_train, y_train), batch_size=batch_size, shuffle=True)
-    for epoch in range(num_epochs):
-        cumulative_loss = 0.0
-        for X, y in train_data:
-            with autograd.record():
-                output = model(X)
-                l = loss(output, y)
-            l.backward()
-            trainer.step(batch_size)
-            cumulative_loss += ndarray.mean(l).asscalar()
-        if epoch % 10 == 0:
-            print("Epoch {}: Loss = {}".format(epoch, cumulative_loss / len(train_data)))
+    model.compile(optimizer='adam', loss='mean_squared_error')
+    model.fit(X_train, y_train, epochs=50, batch_size=32, verbose=0)
 
 # Make predictions using the trained model
 def predict(model, X_test):
-    return model(X_test).asnumpy().flatten()
+    return model.predict(X_test).flatten()
 
 # Main function
 def main():
@@ -76,29 +56,20 @@ def main():
         # Split the data into training and testing sets
         X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
-        # Convert the data to MXNet NDArray format
-        X_train = ndarray.array(X_train, ctx=mx.cpu())
-        y_train = ndarray.array(y_train, ctx=mx.cpu())
-
         # Build the neural network model
         input_dim = X_train.shape[1]
         model = build_model(input_dim)
-        model.initialize(mx.init.Xavier())
 
         # Train the model
         train_model(model, X_train, y_train)
 
-        # Convert the test data to MXNet NDArray format
-        X_test = ndarray.array(X_test, ctx=mx.cpu())
+        # Make predictions
+        predictions = predict(model, X_test)
 
-# Make predictions
-predictions = predict(model, X_test)
-
-# Display the predictions
-st.write("Exchange Rate Predictions:")
-st.write(pd.DataFrame({'Actual Rate': y_test, 'Predicted Rate': predictions}))
+        # Display the predictions
+        st.write("Exchange Rate Predictions:")
+        st.write(pd.DataFrame({'Actual Rate': y_test, 'Predicted Rate': predictions}))
 
 # Run the Streamlit app
 if __name__ == '__main__':
     main()
-
