@@ -37,8 +37,8 @@ def train_model(model, X_train, y_train):
     model.fit(X_train, y_train, epochs=50, batch_size=32, verbose=0)
 
 # Make predictions using the trained model
-def predict(model, X_test):
-    return model.predict(X_test).flatten()
+def predict(model, X):
+    return model.predict(X).flatten()
 
 # Main function
 def main():
@@ -57,22 +57,19 @@ def main():
         X = data[['Number', 'Date']].values.astype(float)
         y = data['Rate'].values.astype(float)
 
-        # Split the data into training and testing sets
-        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
-
         # Build the neural network model
-        input_dim = X_train.shape[1]
+        input_dim = X.shape[1]
         model = build_model(input_dim)
 
         # Train the model
-        train_model(model, X_train, y_train)
+        train_model(model, X, y)
 
-        # Make predictions
-        predictions = predict(model, X_test)
+        # Make predictions on the loaded data
+        predictions = predict(model, X)
 
         # Display the predictions
         st.write("Exchange Rate Predictions:")
-        st.write(pd.DataFrame({'Actual Rate': y_test, 'Predicted Rate': predictions}))
+        st.write(pd.DataFrame({'Rate': data['Rate'], 'Predicted Rate': predictions}))
 
 # Run the Streamlit app
 if __name__ == '__main__':
