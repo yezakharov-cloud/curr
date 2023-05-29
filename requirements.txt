@@ -1,4 +1,3 @@
-pytorch
 pybrain
 keras
 mxnet
