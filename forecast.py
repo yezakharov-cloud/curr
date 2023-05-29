@@ -4,11 +4,10 @@ import torch.nn as nn
 import pandas as pd
 import numpy as np
 
-# Load historical exchange rate data from a CSV file
-def load_data(file_path):
-    data = pd.read_csv(file_path)
+# Load historical exchange rate data from CSV file
+def load_data(filename):
+    data = pd.read_csv(filename)
     return data
-
 
 # Define the neural network model using PyTorch
 class ExchangeRatePredictor(nn.Module):
