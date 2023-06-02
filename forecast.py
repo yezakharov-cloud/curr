@@ -8,7 +8,6 @@ from tensorflow.keras.layers import Dense, LSTM
 from sklearn.preprocessing import MinMaxScaler
 
 
-
 def add_zeros(current_rate):
     return f'{current_rate:.6f}'
 
@@ -136,8 +135,11 @@ def main():
 
         st.title("Exchange Rate Prediction Error")
         st.write(f"Current Rate: {result}")
-        st.write(f"Prediction 1: ", round(prediction,4))
-        st.write(f"Prediction 2: ", round(prediction2,4))
+        st.write(f"Prediction 1: ", round(prediction,6))
+        st.write(f"Prediction 2: ", round(prediction2,6))
+
+        error1 = abs((result - prediction) / result) * 100
+        error2 = abs((result - prediction2) / result) * 100
 
 
     # Run the application
