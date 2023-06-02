@@ -1,5 +1,6 @@
 keras
 tensorflow-cpu
+flask
 keybert==0.6.0
 keyphrase_vectorizers==0.0.10
 matplotlib==3.5.2
