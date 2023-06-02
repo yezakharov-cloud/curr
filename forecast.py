@@ -53,44 +53,46 @@ def predict_rate(model, data):
 
 
 # Create a Keras model for exchange rate prediction
-def create_model():
-    model = Sequential()
-    model.add(Dense(units=50, activation='relu', input_shape=(1,)))
-    model.add(Dense(units=50, activation='relu'))
-    model.add(Dense(units=1))
-    model.compile(optimizer='adam', loss='mean_squared_error')
-    return model
+def create_model2():
+    model2 = Sequential()
+    model2.add(Dense(units=50, activation='relu', input_shape=(1,)))
+    model2.add(Dense(units=50, activation='relu'))
+    model2.add(Dense(units=1))
+    model2.compile(optimizer='adam', loss='mean_squared_error')
+    return model2
 
 # Train the Keras model
-def train_model(model, data):
+def train_model2(model2, data):
     scaler = MinMaxScaler(feature_range=(0, 1))
     scaled_data = scaler.fit_transform(data)
 
     x_train = scaled_data[:-1]
     y_train = scaled_data[1:]
 
-    model.fit(x_train, y_train, epochs=20, batch_size=1, verbose=2)
+    model2.fit(x_train, y_train, epochs=20, batch_size=1, verbose=2)
 
 # Predict the exchange rate using the trained model
-def predict_rate(model, data):
+def predict_rate2(model2, data):
     scaler = MinMaxScaler(feature_range=(0, 1))
     scaled_data = scaler.fit_transform(data)
 
     x_test = scaled_data[-1]
-    predicted_rate = model.predict(np.array([x_test]))
+    predicted_rate = model2.predict(np.array([x_test]))
     predicted_rate = scaler.inverse_transform(predicted_rate)
     return predicted_rate[0][0]
 
 
 # Main function
 def main():
-    st.title('Exchange Rate Prediction TensorFlow')
+
    
     # Upload historical data file
     uploaded_file = st.file_uploader('Upload CSV file', type=['csv'])
     
     if uploaded_file is not None:
         data = load_data(uploaded_file)
+
+        st.title('Exchange Rate Prediction TensorFlow')
 
         st.subheader('Historical Data')
         st.dataframe(data)  # Display all loaded values
@@ -111,14 +113,14 @@ def main():
         st.subheader('Historical Data')
         st.dataframe(data)  # Display all loaded values
 
-        model = create_model()
+        model2 = create_model2()
 
         st.subheader('Train Model')
-        train_model(model, data['Rate'].values.reshape(-1, 1))
+        train_model2(model2, data['Rate'].values.reshape(-1, 1))
         st.write('Model training complete.')
 
         st.subheader('Exchange Rate Prediction')
-        prediction = predict_rate(model, data['Rate'].values.reshape(-1, 1))
+        prediction2 = predict_rate2(model2, data['Rate'].values.reshape(-1, 1))
         st.write('Predicted exchange rate:', prediction)
 
 
