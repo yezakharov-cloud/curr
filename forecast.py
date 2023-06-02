@@ -32,8 +32,8 @@ def create_tensorflow_model():
         x_train = []
         y_train = []
         for i in range(1, len(scaled_data)):
-         x_train.append(scaled_data[i-1:i])
-         y_train.append(scaled_data[i])
+        x_train.append(scaled_data[i-1:i])
+        y_train.append(scaled_data[i])
 
         x_train, y_train = np.array(x_train), np.array(y_train)
         x_train = np.reshape(x_train, (x_train.shape[0], x_train.shape[1], 1))
@@ -73,9 +73,7 @@ def create_tensorflow_model():
         prediction = predict_rate(model, data['Rate'].values.reshape(-1, 1))
         st.write('Predicted exchange rate:', prediction)
      
-     
-     
-     
+         
      
     
 # Function to create a Keras model
