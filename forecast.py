@@ -91,10 +91,16 @@ def predict_rate2(model2, data):
     predicted_rate = scaler.inverse_transform(predicted_rate)
     return predicted_rate[0][0]
 
+def round_to_six_decimal_places(number):
+    rounded_number = round(number, 6)
+    return rounded_number
+
 def calculate_error(prediction, prediction2, current_rate):
-    error1 = abs((current_rate - prediction) / current_rate) * 100
-    error2 = abs((current_rate - prediction2) / current_rate) * 100
+    error1 = abs((result - rounded_prediction) / result) * 100
+    error2 = abs((result - rounded_prediction2) / result) * 100
     return error1, error2
+
+
 
 # Main function
 def main():
@@ -119,6 +125,7 @@ def main():
         
         st.subheader('Прогноз обмінного курсу TensorFlow')
         prediction = predict_rate(model, data['Rate'].values.reshape(-1, 1))
+        rounded_prediction = round(prediction, 6)
         st.write('Прогнозований обмінний курс:', prediction)
 
         st.title('Прогнозування обмінного курсу Keras')
@@ -135,13 +142,17 @@ def main():
 
         st.subheader('Прогнозування обмінного курсу Keras')
         prediction2 = predict_rate2(model2, data['Rate'].values.reshape(-1, 1))
+        rounded_prediction2 = round(prediction2, 6)
         st.write('Прогнозований обмінний курс:', prediction2)
 
+        error1, error2 = calculate_error(rounded_prediction, rounded_prediction2, result)
 
         st.title("Exchange Rate Prediction Error")
         st.write(f"Current Rate: {result}")
-        st.write(f"Prediction 1: {prediction}")
-        st.write(f"Prediction 2: {prediction2}")
+        st.write(f"Prediction 1: {rounded_prediction}")
+        st.write(f"Prediction 2: {rounded_prediction2}")
+        st.write(f"Error for Prediction 1: {error1}")
+        st.write(f"Error for Prediction 2: {error2}")
 
 
 # Run the application
