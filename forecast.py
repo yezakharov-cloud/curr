@@ -135,8 +135,7 @@ def main():
 
         result = 38.233463287353516
 
-        error1 = abs((result - rounded_prediction) / result) * 100
-        error2 = abs((result - rounded_prediction2) / result) * 100
+
 
 
         st.title("Exchange Rate Prediction Error")
