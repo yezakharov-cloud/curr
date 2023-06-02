@@ -8,12 +8,9 @@ from tensorflow.keras.layers import Dense, LSTM
 from sklearn.preprocessing import MinMaxScaler
 
 
-def add_zeros(current_rate):
-    return f'{current_rate:.6f}'
-
 
 st.title("Введіть відомий курс валюти")
-current_rate = st.text_input("приклад:(50.0000):")
+current_rate = st.number_input('приклад:(50.0000)')
 if current_rate:
     st.write(f"Поточний курс: {current_rate}")
 
