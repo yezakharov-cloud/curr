@@ -52,12 +52,6 @@ def predict_rate(model, data):
 
 
 
-
-# Load historical exchange rate data from CSV file
-def load_data_keras(filename):
-    data_keras = pd.read_csv(filename)
-    return data_keras
-
 # Create a Keras model for exchange rate prediction
 def create_model_keras():
     model_keras = Sequential()
