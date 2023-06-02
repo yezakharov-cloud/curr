@@ -138,14 +138,10 @@ def main():
         st.write('Прогнозований обмінний курс:', prediction2)
 
 
-        error1, error2 = calculate_error(prediction, prediction2, current_rate)
-
         st.title("Exchange Rate Prediction Error")
         st.write(f"Current Rate: {result}")
         st.write(f"Prediction 1: {prediction}")
         st.write(f"Prediction 2: {prediction2}")
-        st.write(f"Error for Prediction 1: {error1:.2f}%")
-        st.write(f"Error for Prediction 2: {error2:.2f}%")
 
 
 # Run the application
