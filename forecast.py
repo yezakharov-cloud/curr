@@ -74,4 +74,4 @@ def mainT():
 
 # Run the application
 if __name__ == '__mainT__':
-    main()T
+    mainT()
