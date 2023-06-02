@@ -15,8 +15,7 @@ def add_zeros(current_rate):
 st.title("Введіть відомий курс валюти")
 current_rate = st.text_input("приклад:(50.0000):")
 if current_rate:
-    result = add_zeros(float(current_rate))
-    st.write(f"Поточний курс: {result}")
+    st.write(f"Поточний курс: {current_rate}")
 
 # Load historical exchange rate data from CSV file
 def load_data(filename):
@@ -134,12 +133,12 @@ def main():
         st.write('Прогнозований обмінний курс:', prediction2)
 
         st.title("Exchange Rate Prediction Error")
-        st.write(f"Current Rate: {result}")
+        st.write(f"Current Rate: {current_rate}")
         st.write(f"Prediction 1: ", round(prediction,6))
         st.write(f"Prediction 2: ", round(prediction2,6))
 
-        error1 = abs((result - prediction) / result) * 100
-        error2 = abs((result - prediction2) / result) * 100
+        error1 = abs((current_rate - prediction) / current_rate) * 100
+        error2 = abs((current_rate - prediction2) / current_rate) * 100
 
 
     # Run the application
