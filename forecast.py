@@ -89,7 +89,7 @@ def predict_rate_keras(model, data):
 
 # Main function
 def main():
-    st.title('Exchange Rate Prediction')
+    st.title('Exchange Rate Prediction TensorFlow')
     
     # Upload historical data file
     uploaded_file = st.file_uploader('Upload CSV file', type=['csv'])
@@ -109,6 +109,28 @@ def main():
         st.subheader('Exchange Rate Prediction')
         prediction = predict_rate(model, data['Rate'].values.reshape(-1, 1))
         st.write('Predicted exchange rate:', prediction)
+
+    st.title('Exchange Rate Prediction Keras')
+
+    # Upload historical data file
+    uploaded_file_keras = st.file_uploader('Upload CSV file', type=['csv'])
+
+    if uploaded_file_keras is not None:
+        data_keras = load_data(uploaded_file_keras)
+
+        st.subheader('Historical Data')
+        st.dataframe(data_keras)  # Display all loaded values
+
+        model_keras = create_model_keras()
+
+        st.subheader('Train Model')
+        train_model_keras(model_keras, data_keras['Rate'].values.reshape(-1, 1))
+        st.write('Model training complete.')
+
+        st.subheader('Exchange Rate Prediction')
+        prediction_keras = predict_rate_keras(model_keras, data_keras['Rate'].values.reshape(-1, 1))
+        st.write('Predicted exchange rate:', prediction_keras)
+
 
 # Run the application
 if __name__ == '__main__':
