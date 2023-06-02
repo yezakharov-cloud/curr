@@ -12,8 +12,8 @@ def create_tensorflow_model():
   
     # Load historical exchange rate data from CSV file
     def load_data(filename):
-    data = pd.read_csv(filename)
-    return data
+        data = pd.read_csv(filename)
+        return data
 
     # Create a LSTM model for exchange rate prediction
     def create_model():
