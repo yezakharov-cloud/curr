@@ -137,10 +137,10 @@ def main():
         prediction2 = predict_rate2(model2, data['Rate'].values.reshape(-1, 1))
         st.write('Прогнозований обмінний курс:', prediction2)
 
-        error1, error2 = calculate_error(prediction, prediction2, current_rate)
+        error1, error2 = calculate_error(prediction, prediction2, result)
 
         st.title("Exchange Rate Prediction Error")
-        st.write(f"Current Rate: {current_rate}")
+        st.write(f"Current Rate: {result}")
         st.write(f"Prediction 1: {prediction}")
         st.write(f"Prediction 2: {prediction2}")
         st.write(f"Error for Prediction 1: {error1}")
