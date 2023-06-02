@@ -91,9 +91,9 @@ def predict_rate2(model2, data):
     predicted_rate = scaler.inverse_transform(predicted_rate)
     return predicted_rate[0][0]
 
-def calculate_error(prediction, prediction2, current_rate):
-    error1 = abs(current_rate - prediction)
-    error2 = abs(current_rate - prediction2)
+def calculate_error(prediction, prediction2, result):
+    error1 = abs(result - prediction)
+    error2 = abs(result - prediction2)
     return error1, error2
 
 # Main function
