@@ -11,12 +11,12 @@ from sklearn.preprocessing import MinMaxScaler
 def add_zeros(current_rate):
     return f'{current_rate:.6f}'
 
-def main():
-    st.title("Введіть відомий курс валюти")
-    current_rate = st.text_input("(приклад, 50.000000):")
-    if current_rate:
-        result = add_zeros(float(current_rate))
-        st.write(f"Поточний курс: {result}")
+
+st.title("Введіть відомий курс валюти")
+current_rate = st.text_input("(приклад, 50.000000):")
+if current_rate:
+    result = add_zeros(float(current_rate))
+    st.write(f"Поточний курс: {result}")
 
 # Load historical exchange rate data from CSV file
 def load_data(filename):
