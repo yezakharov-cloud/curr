@@ -129,13 +129,17 @@ def main():
 
         st.write('Прогнозований обмінний курс:', prediction2)
 
-        st.title("Exchange Rate Prediction Error")
-        st.write(f"Current Rate: {current_rate}")
-        st.write(f"Prediction 1: ", round(prediction,6))
-        st.write(f"Prediction 2: ", round(prediction2,6))
-
         error1 = abs((current_rate - prediction) / current_rate) * 100
         error2 = abs((current_rate - prediction2) / current_rate) * 100
+
+        st.title("Exchange Rate Prediction Error")
+        st.write(f"Current Rate: {current_rate}")
+        st.write(f"Prediction 1: ", round(prediction,4))
+        st.write(f"Prediction 2: ", round(prediction2,4))
+        st.write(f"Error 1: ", error1)
+        st.write(f"Error 2: ", error2)
+
+
 
 
     # Run the application
