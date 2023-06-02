@@ -113,7 +113,7 @@ def main():
         st.write('Навчання моделі TensorFlow завершено')
         
         st.subheader('Прогноз обмінного курсу TensorFlow')
-        prediction = round(predict_rate(model, data['Rate'].values.reshape(-1, 1)),4)
+        prediction = predict_rate(model, data['Rate'].values.reshape(-1, 1))
 
         st.write('Прогнозований обмінний курс:', prediction)
 
@@ -129,20 +129,15 @@ def main():
         st.write('Навчання моделі Keras завершено')
 
         st.subheader('Прогнозування обмінного курсу Keras')
-        prediction2 = round(predict_rate2(model2, data['Rate'].values.reshape(-1, 1)),4)
+        prediction2 = predict_rate2(model2, data['Rate'].values.reshape(-1, 1))
 
         st.write('Прогнозований обмінний курс:', prediction2)
-
-        error1 = abs((result - round(prediction,4)) / result) * 100
-        error2 = abs((result - round(prediction2,4)) / result) * 100
 
         st.title("Exchange Rate Prediction Error")
         st.write(f"Current Rate: {result}")
         st.write(f"Prediction 1: ", round(prediction,4))
         st.write(f"Prediction 2: ", round(prediction2,4))
 
-        st.write(f"Error for Prediction 1:", error1)
-        st.write(f"Error for Prediction 2:", error2)
 
     # Run the application
 if __name__ == '__main__':
