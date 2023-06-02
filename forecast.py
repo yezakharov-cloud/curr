@@ -134,12 +134,18 @@ def main():
         rounded_prediction2 = round(prediction2, 6)
         st.write('Прогнозований обмінний курс:', prediction2)
 
+        result = 38.233463287353516
+
+        error1 = abs((result - rounded_prediction) / result) * 100
+        error2 = abs((result - rounded_prediction2) / result) * 100
+
 
         st.title("Exchange Rate Prediction Error")
         st.write(f"Current Rate: {result}")
         st.write(f"Prediction 1: {rounded_prediction}")
         st.write(f"Prediction 2: {rounded_prediction2}")
-
+        st.write(f"Error for Prediction 1: {error1}")
+        st.write(f"Error for Prediction 2: {error2}")
 
 # Run the application
 if __name__ == '__main__':
