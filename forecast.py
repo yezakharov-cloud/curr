@@ -10,7 +10,7 @@ from sklearn.preprocessing import MinMaxScaler
 
 
 st.title("Введіть відомий курс валюти")
-current_rate = st.number_input('приклад:(50.0000)')
+current_rate = st.number_input('приклад:(50)')
 if current_rate:
     st.write(f"Поточний курс: {current_rate}")
 
