@@ -24,5 +24,10 @@ def main():
     if st.button("Create TensorFlow Model"):
         tensorflow_model = create_tensorflow_model()
 
+          
+    # Button to create Keras model
+    if st.button("Create Keras Model"):
+        keras_model = create_keras_model()
+
 if __name__ == "__main__":
     main()
