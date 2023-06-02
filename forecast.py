@@ -10,7 +10,7 @@ from sklearn.preprocessing import MinMaxScaler
 # Function to create a TensorFlow model
 def create_tensorflow_model():
   
-# Load historical exchange rate data from CSV file
+    # Load historical exchange rate data from CSV file
     def load_data(filename):
     data = pd.read_csv(filename)
     return data
