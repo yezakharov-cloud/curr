@@ -8,6 +8,7 @@ from tensorflow.keras.layers import Dense, LSTM
 from sklearn.preprocessing import MinMaxScaler
 
 
+
 def add_zeros(current_rate):
     return f'{current_rate:.6f}'
 
