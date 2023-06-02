@@ -136,5 +136,5 @@ def second():
         st.write('Predicted exchange rate:', prediction)
 
 # Run the application
-if __name__ == '__second__':
-    second()
+
+second()
