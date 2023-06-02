@@ -15,3 +15,11 @@ def create_tensorflow_model():
 # Function to create a Keras model
 def create_keras_model():
     st.write('Keras works OK')
+
+# Main function
+def main():
+    st.title("Exchange Rate Prediction")
+
+
+if __name__ == "__main__":
+    main()
