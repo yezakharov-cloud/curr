@@ -64,19 +64,19 @@ def create_model_keras():
 # Train the Keras model
 def train_model_keras(model, data):
     scaler_keras = MinMaxScaler(feature_range=(0, 1))
-    scaled_data_keras = scaler_keras.fit_transform(data_keras)
+    scaled_data = scaler_keras.fit_transform(data)
 
-    x_train_keras = scaled_data_keras[:-1]
-    y_train_keras = scaled_data_keras[1:]
+    x_train_keras = scaled_data[:-1]
+    y_train_keras = scaled_data[1:]
 
     model_keras.fit(x_train_keras, y_train_keras, epochs=20, batch_size=1, verbose=2)
 
 # Predict the exchange rate using the trained model
 def predict_rate_keras(model, data):
     scaler_keras = MinMaxScaler(feature_range=(0, 1))
-    scaled_data_keras = scaler_keras.fit_transform(data_keras)
+    scaled_data = scaler_keras.fit_transform(data)
 
-    x_test_keras = scaled_data_keras[-1]
+    x_test_keras = scaled_data[-1]
     predicted_rate_keras = model_keras.predict(np.array([x_test_keras]))
     predicted_rate_keras = scaler_keras.inverse_transform(predicted_rate_keras)
     return predicted_rate_keras[0][0]
