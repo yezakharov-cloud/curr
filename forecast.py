@@ -112,11 +112,9 @@ def main():
 
     st.title('Exchange Rate Prediction Keras')
 
-    # Upload historical data file
-    uploaded_file_keras = st.file_uploader('Upload CSV file', type=['csv'])
 
-    if uploaded_file_keras is not None:
-        data_keras = load_data(uploaded_file_keras)
+    if uploaded_file is not None:
+        data_keras = load_data(uploaded_file)
 
         st.subheader('Historical Data')
         st.dataframe(data_keras)  # Display all loaded values
