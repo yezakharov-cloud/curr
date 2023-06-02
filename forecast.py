@@ -1,20 +1,14 @@
-from flask import Flask, request, render_template_string
+import streamlit as st
 
-app = Flask(__name__)
+def add_zeros(current_rate):
+    return f'{current_rate:.6f}'
 
-@app.route('/', methods=['GET', 'POST'])
-def index():
-    if request.method == 'POST':
-        user_input = request.form['rate']
-        current_rate = f'{user_input:.6f}'  # Adds six zeros after the decimal point
-        return f"The current rate is: {current_rate}"
-    return render_template_string('''
-        <form method="POST" action="/">
-            <label for="rate">Enter the rate:</label>
-            <input type="number" step="0.000001" name="rate" id="rate" required>
-            <input type="submit" value="Submit">
-        </form>
-    ''')
+def main():
+    st.title("Rate Calculator")
+    current_rate = st.text_input("Enter the rate (e.g., 12.345678):")
+    if current_rate:
+        result = add_zeros(float(current_rate))
+        st.write(f"The current rate is: {result}")
 
 if __name__ == '__main__':
-    app.run()
+    main()
