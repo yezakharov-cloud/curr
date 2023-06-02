@@ -7,13 +7,14 @@ from tensorflow.keras.layers import Dense
 from tensorflow.keras.layers import Dense, LSTM
 from sklearn.preprocessing import MinMaxScaler
 
-# Load historical exchange rate data from CSV file
-def load_data(filename):
-    data = pd.read_csv(filename)
-    return data
+
 
 # Function to create a TensorFlow model
 def create_tensorflow_model():
+    # Load historical exchange rate data from CSV file
+    def load_data(filename):
+        data = pd.read_csv(filename)
+        return data
 
      # Create a LSTM model for exchange rate prediction
      def create_model():
