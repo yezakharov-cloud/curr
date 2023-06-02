@@ -92,36 +92,36 @@ def main():
     if uploaded_file is not None:
         data = load_data(uploaded_file)
 
-        st.title('Exchange Rate Prediction TensorFlow')
+        st.title('Прогноз обмінного курсу TensorFlow')
 
-        st.subheader('Historical Data')
+        st.subheader('Історичні дані')
         st.dataframe(data)  # Display all loaded values
         
         model = create_model()
         
-        st.subheader('Train Model')
+        st.subheader('Навчання моделі TensorFlow')
         train_model(model, data['Rate'].values.reshape(-1, 1))
-        st.write('Model training complete.')
+        st.write('Навчання моделі TensorFlow завершено')
         
-        st.subheader('Exchange Rate Prediction')
+        st.subheader('Прогноз обмінного курсу TensorFlow')
         prediction = predict_rate(model, data['Rate'].values.reshape(-1, 1))
-        st.write('Predicted exchange rate:', prediction)
+        st.write('Прогнозований обмінний курс:', prediction)
 
-        st.title('Exchange Rate Prediction Keras')
+        st.title('Прогнозування обмінного курсу Keras')
 
 
-        st.subheader('Historical Data')
+        st.subheader('Історичні дані')
         st.dataframe(data)  # Display all loaded values
 
         model2 = create_model2()
 
-        st.subheader('Train Model')
+        st.subheader('Навчання моделі Keras')
         train_model2(model2, data['Rate'].values.reshape(-1, 1))
-        st.write('Model training complete.')
+        st.write('Навчання моделі Keras завершено')
 
-        st.subheader('Exchange Rate Prediction')
+        st.subheader('Прогнозування обмінного курсу Keras')
         prediction2 = predict_rate2(model2, data['Rate'].values.reshape(-1, 1))
-        st.write('Predicted exchange rate:', prediction2)
+        st.write('Прогнозований обмінний курс:', prediction2)
 
 
 # Run the application
