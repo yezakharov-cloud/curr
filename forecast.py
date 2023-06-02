@@ -141,8 +141,8 @@ def main():
         st.write(f"Prediction 1: ", round(prediction,4))
         st.write(f"Prediction 2: ", round(prediction2,4))
 
-        st.write(f"Error for Prediction 1:", error1
-        st.write(f"Error for Prediction 2:", error2
+        st.write(f"Error for Prediction 1:", error1)
+        st.write(f"Error for Prediction 2:", error2)
 
     # Run the application
 if __name__ == '__main__':
