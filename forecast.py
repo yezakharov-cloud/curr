@@ -113,7 +113,7 @@ def predict_rate(model, data):
     return predicted_rate[0][0]
 
 # Main function
-def main2():
+def main():
     st.title('Exchange Rate Prediction')
 
     # Upload historical data file
@@ -136,5 +136,5 @@ def main2():
         st.write('Predicted exchange rate:', prediction)
 
 # Run the application
-if __name__ == '__main2__':
-    main2()
+if __name__ == '__main__':
+    main()
