@@ -151,8 +151,6 @@ def main():
         st.write(f"Current Rate: {result}")
         st.write(f"Prediction 1: {rounded_prediction}")
         st.write(f"Prediction 2: {rounded_prediction2}")
-        st.write(f"Error for Prediction 1: {error1}")
-        st.write(f"Error for Prediction 2: {error2}")
 
 
 # Run the application
