@@ -13,9 +13,7 @@ def load_data(filename):
     data = pd.read_csv(filename)
     return data
 
-# Upload historical data file
-uploaded_file = st.file_uploader('Upload CSV file', type=['csv'])
-
+    
 if uploaded_file is not None:
     data = load_data(uploaded_file)
 
