@@ -91,17 +91,6 @@ def predict_rate2(model2, data):
     predicted_rate = scaler.inverse_transform(predicted_rate)
     return predicted_rate[0][0]
 
-def round_to_six_decimal_places(number):
-    rounded_number = round(number, 6)
-    return rounded_number
-
-def calculate_error(prediction, prediction2, current_rate):
-    error1 = abs((result - rounded_prediction) / result) * 100
-    error2 = abs((result - rounded_prediction2) / result) * 100
-    return error1, error2
-
-
-
 # Main function
 def main():
 
@@ -145,13 +134,16 @@ def main():
         rounded_prediction2 = round(prediction2, 6)
         st.write('Прогнозований обмінний курс:', prediction2)
 
-        error1, error2 = calculate_error(rounded_prediction, rounded_prediction2, result)
+        error1 = abs((result - rounded_prediction) / result) * 100
+        error2 = abs((result - rounded_prediction2) / result) * 100
+
 
         st.title("Exchange Rate Prediction Error")
         st.write(f"Current Rate: {result}")
         st.write(f"Prediction 1: {rounded_prediction}")
         st.write(f"Prediction 2: {rounded_prediction2}")
-
+        st.write(f"Error for Prediction 1: {error1}")
+        st.write(f"Error for Prediction 2: {error2}")
 
 # Run the application
 if __name__ == '__main__':
