@@ -13,7 +13,7 @@ def add_zeros(current_rate):
 
 
 st.title("Введіть відомий курс валюти")
-current_rate = st.text_input("приклад:(50.000000):")
+current_rate = st.text_input("приклад:(50.0000):")
 if current_rate:
     result = add_zeros(float(current_rate))
     st.write(f"Поточний курс: {result}")
@@ -133,16 +133,18 @@ def main():
 
         st.write('Прогнозований обмінний курс:', prediction2)
 
-        result = 38.0000
-
+        error1 = abs((result - round(prediction,4)) / result) * 100
+        error2 = abs((result - round(prediction2,4)) / result) * 100
 
         st.title("Exchange Rate Prediction Error")
         st.write(f"Current Rate: {result}")
         st.write(f"Prediction 1: ", round(prediction,4))
         st.write(f"Prediction 2: ", round(prediction2,4))
 
+        st.write(f"Error for Prediction 1:", error1
+        st.write(f"Error for Prediction 2:", error2
 
-# Run the application
+    # Run the application
 if __name__ == '__main__':
     main()
 
