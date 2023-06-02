@@ -7,6 +7,7 @@ from tensorflow.keras.layers import Dense
 from tensorflow.keras.layers import Dense, LSTM
 from sklearn.preprocessing import MinMaxScaler
 
+
 # Load historical exchange rate data from CSV file
 def load_data(filename):
     data = pd.read_csv(filename)
@@ -50,7 +51,7 @@ def predict_rate(model, data):
     return predicted_rate[0][0]
 
 # Main function
-def mainT():
+def main():
     st.title('Exchange Rate Prediction')
     
     # Upload historical data file
@@ -73,5 +74,5 @@ def mainT():
         st.write('Predicted exchange rate:', prediction)
 
 # Run the application
-if __name__ == '__mainT__':
-    mainT()
+if __name__ == '__main__':
+    main()
