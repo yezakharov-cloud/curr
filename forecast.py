@@ -121,9 +121,12 @@ def main():
 
         st.subheader('Exchange Rate Prediction')
         prediction2 = predict_rate2(model2, data['Rate'].values.reshape(-1, 1))
-        st.write('Predicted exchange rate:', prediction)
+        st.write('Predicted exchange rate:', prediction2)
 
 
 # Run the application
 if __name__ == '__main__':
     main()
+
+
+
