@@ -13,6 +13,12 @@ def load_data(filename):
     data = pd.read_csv(filename)
     return data
 
+# Upload historical data file
+uploaded_file = st.file_uploader('Upload CSV file', type=['csv'])
+
+if uploaded_file is not None:
+    data = load_data(uploaded_file)
+
 # Create a LSTM model for exchange rate prediction
 def create_model():
     model = Sequential()
@@ -85,43 +91,35 @@ def predict_rate_keras(model, data):
 def main():
     st.title('Exchange Rate Prediction TensorFlow')
     
-    # Upload historical data file
-    uploaded_file = st.file_uploader('Upload CSV file', type=['csv'])
+    st.subheader('Historical Data')
+    st.dataframe(data)  # Display all loaded values
     
-    if uploaded_file is not None:
-        data = load_data(uploaded_file)
-        
-        st.subheader('Historical Data')
-        st.dataframe(data)  # Display all loaded values
-        
-        model = create_model()
-        
-        st.subheader('Train Model')
-        train_model(model, data['Rate'].values.reshape(-1, 1))
-        st.write('Model training complete.')
-        
-        st.subheader('Exchange Rate Prediction')
-        prediction = predict_rate(model, data['Rate'].values.reshape(-1, 1))
-        st.write('Predicted exchange rate:', prediction)
+    model = create_model()
+    
+    st.subheader('Train Model')
+    train_model(model, data['Rate'].values.reshape(-1, 1))
+    st.write('Model training complete.')
+    
+    st.subheader('Exchange Rate Prediction')
+    prediction = predict_rate(model, data['Rate'].values.reshape(-1, 1))
+    st.write('Predicted exchange rate:', prediction)
 
     st.title('Exchange Rate Prediction Keras')
 
 
-    if uploaded_file is not None:
-        data_keras = load_data(uploaded_file)
 
-        st.subheader('Historical Data')
-        st.dataframe(data_keras)  # Display all loaded values
+    st.subheader('Historical Data')
+    st.dataframe(data)  # Display all loaded values
 
-        model_keras = create_model_keras()
+    model_keras = create_model_keras()
 
-        st.subheader('Train Model')
-        train_model_keras(model_keras, data_keras['Rate'].values.reshape(-1, 1))
-        st.write('Model training complete.')
+    st.subheader('Train Model')
+    train_model_keras(model_keras, data['Rate'].values.reshape(-1, 1))
+    st.write('Model training complete.')
 
-        st.subheader('Exchange Rate Prediction')
-        prediction_keras = predict_rate_keras(model_keras, data_keras['Rate'].values.reshape(-1, 1))
-        st.write('Predicted exchange rate:', prediction_keras)
+    st.subheader('Exchange Rate Prediction')
+    prediction_keras = predict_rate_keras(model_keras, data['Rate'].values.reshape(-1, 1))
+    st.write('Predicted exchange rate:', prediction_keras)
 
 
 # Run the application
