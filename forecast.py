@@ -13,7 +13,7 @@ def add_zeros(current_rate):
 
 
 st.title("Введіть відомий курс валюти")
-current_rate = st.text_input("(приклад, 50.000000):")
+current_rate = st.text_input("приклад:(50.000000):")
 if current_rate:
     result = add_zeros(float(current_rate))
     st.write(f"Поточний курс: {result}")
@@ -91,6 +91,10 @@ def predict_rate2(model2, data):
     predicted_rate = scaler.inverse_transform(predicted_rate)
     return predicted_rate[0][0]
 
+def calculate_error(prediction, prediction2, current_rate):
+    error1 = abs(current_rate - prediction)
+    error2 = abs(current_rate - prediction2)
+    return error1, error2
 
 # Main function
 def main():
@@ -132,6 +136,15 @@ def main():
         st.subheader('Прогнозування обмінного курсу Keras')
         prediction2 = predict_rate2(model2, data['Rate'].values.reshape(-1, 1))
         st.write('Прогнозований обмінний курс:', prediction2)
+
+        error1, error2 = calculate_error(prediction, prediction2, current_rate)
+
+        st.title("Exchange Rate Prediction Error")
+        st.write(f"Current Rate: {current_rate}")
+        st.write(f"Prediction 1: {prediction}")
+        st.write(f"Prediction 2: {prediction2}")
+        st.write(f"Error for Prediction 1: {error1}")
+        st.write(f"Error for Prediction 2: {error2}")
 
 
 # Run the application
