@@ -90,7 +90,7 @@ def main():
     
     if uploaded_file is not None:
         data = load_data(uploaded_file)
-    
+
         st.subheader('Historical Data')
         st.dataframe(data)  # Display all loaded values
         
@@ -111,14 +111,14 @@ def main():
         st.subheader('Historical Data')
         st.dataframe(data)  # Display all loaded values
 
-        model_keras = create_model_keras()
+        model2 = create_model_keras()
 
         st.subheader('Train Model')
-        train_model_keras(model_keras, data['Rate'].values.reshape(-1, 1))
+        train_model_keras(model2, data['Rate'].values.reshape(-1, 1))
         st.write('Model training complete.')
 
         st.subheader('Exchange Rate Prediction')
-        prediction_keras = predict_rate_keras(model_keras, data['Rate'].values.reshape(-1, 1))
+        prediction_keras = predict_rate_keras(model2, data['Rate'].values.reshape(-1, 1))
         st.write('Predicted exchange rate:', prediction_keras)
 
 
