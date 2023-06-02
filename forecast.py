@@ -13,7 +13,7 @@ from sklearn.preprocessing import MinMaxScaler
 def create_tensorflow_model():
     
     # Load historical exchange rate data from CSV file
-    def load_data(filename):
+     def load_data(filename):
         data = pd.read_csv(filename)
         return data
 
