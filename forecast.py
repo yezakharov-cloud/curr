@@ -21,12 +21,12 @@ def main():
     st.title("Веб-сервіс формування рекомендацій для коригування прогнозу фінансово-економічних показників на основі аналізу новин")
 
     # Button to create TensorFlow model
-    if st.button("Create TensorFlow Model"):
+    if st.button("Створити та запустити модель TensorFlow"):
         tensorflow_model = create_tensorflow_model()
 
           
     # Button to create Keras model
-    if st.button("Create Keras Model"):
+    if st.button("Створити та запустити модель Keras"):
         keras_model = create_keras_model()
 
 if __name__ == "__main__":
