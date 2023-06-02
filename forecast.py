@@ -114,7 +114,7 @@ def main():
         
         st.subheader('Прогноз обмінного курсу TensorFlow')
         prediction = predict_rate(model, data['Rate'].values.reshape(-1, 1))
-        rounded_prediction = round(prediction, 6)
+        rounded_prediction = round(prediction, 2)
         st.write('Прогнозований обмінний курс:', prediction)
 
         st.title('Прогнозування обмінного курсу Keras')
@@ -131,7 +131,7 @@ def main():
 
         st.subheader('Прогнозування обмінного курсу Keras')
         prediction2 = predict_rate2(model2, data['Rate'].values.reshape(-1, 1))
-        rounded_prediction2 = round(prediction2, 6)
+        rounded_prediction2 = round(prediction2, 2)
         st.write('Прогнозований обмінний курс:', prediction2)
 
         result = 38.233463287353516
