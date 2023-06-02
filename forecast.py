@@ -18,7 +18,7 @@ def create_keras_model():
 
 # Main function
 def main():
-    st.title("Exchange Rate Prediction")
+    st.title("ВЕБ-СЕРВІС ФОРМУВАННЯ РЕКОМЕНДАЦІЙ ДЛЯ КОРИГУВАННЯ ПРОГНОЗУ ФІНАНСОВО-ЕКОНОМІЧНИХ ПОКАЗНИКІВ НА ОСНОВІ АНАЛІЗУ НОВИН")
 
 
 if __name__ == "__main__":
