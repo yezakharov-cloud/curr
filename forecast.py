@@ -114,11 +114,10 @@ def main():
         
         st.subheader('Прогноз обмінного курсу TensorFlow')
         prediction = predict_rate(model, data['Rate'].values.reshape(-1, 1))
-        rounded_prediction = round(prediction, 2)
+
         st.write('Прогнозований обмінний курс:', prediction)
 
         st.title('Прогнозування обмінного курсу Keras')
-
 
         st.subheader('Історичні дані')
         st.dataframe(data)  # Display all loaded values
@@ -130,8 +129,8 @@ def main():
         st.write('Навчання моделі Keras завершено')
 
         st.subheader('Прогнозування обмінного курсу Keras')
-        prediction2 = predict_rate2(model2, data['Rate'].values.reshape(-1, 1))
-        rounded_prediction2 = round(prediction2, 2)
+        prediction2 = round(predict_rate2(model2, data['Rate'].values.reshape(-1, 1)),2)
+
         st.write('Прогнозований обмінний курс:', prediction2)
 
         result = 38.233463287353516
@@ -142,8 +141,8 @@ def main():
 
         st.title("Exchange Rate Prediction Error")
         st.write(f"Current Rate: {result}")
-        st.write(f"Prediction 1: {rounded_prediction}")
-        st.write(f"Prediction 2: {rounded_prediction2}")
+        st.write(f"Prediction 1: {prediction}")
+        st.write(f"Prediction 2: {prediction2}")
         st.write(f"Error for Prediction 1: {error1}")
         st.write(f"Error for Prediction 2: {error2}")
 
