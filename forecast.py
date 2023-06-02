@@ -136,8 +136,8 @@ def main():
         st.write(f"Current Rate: {current_rate}")
         st.write(f"Prediction 1: ", round(prediction,4))
         st.write(f"Prediction 2: ", round(prediction2,4))
-        st.write(f"Error 1: ", error1)
-        st.write(f"Error 2: ", error2)
+        st.write(f"Error 1: ", round(error1),2),"%"
+        st.write(f"Error 2: ", round(error2),2),"%"
 
 
 
