@@ -18,8 +18,11 @@ def create_keras_model():
 
 # Main function
 def main():
-    st.title("веб-сервіс формування рекомендацій для коригування прогнозу фінансово-економічних показників на основі аналізу новин")
+    st.title("Веб-сервіс формування рекомендацій для коригування прогнозу фінансово-економічних показників на основі аналізу новин")
 
+    # Button to create TensorFlow model
+    if st.button("Create TensorFlow Model"):
+        tensorflow_model = create_tensorflow_model()
 
 if __name__ == "__main__":
     main()
