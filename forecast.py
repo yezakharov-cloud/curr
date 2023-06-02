@@ -78,14 +78,6 @@ if __name__ == '__main__':
     main()
 
 
-import streamlit as st
-import pandas as pd
-import numpy as np
-import tensorflow as tf
-from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import Dense
-from sklearn.preprocessing import MinMaxScaler
-
 # Load historical exchange rate data from CSV file
 def load_data(filename):
     data = pd.read_csv(filename)
@@ -121,7 +113,7 @@ def predict_rate(model, data):
     return predicted_rate[0][0]
 
 # Main function
-def main():
+def main2():
     st.title('Exchange Rate Prediction')
 
     # Upload historical data file
@@ -144,5 +136,5 @@ def main():
         st.write('Predicted exchange rate:', prediction)
 
 # Run the application
-if __name__ == '__main__':
-    main()
+if __name__ == '__main2__':
+    main2()
