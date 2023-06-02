@@ -92,7 +92,7 @@ def main():
 
    
     # Upload historical data file
-    uploaded_file = st.file_uploader('Upload CSV file', type=['csv'])
+    uploaded_file = st.file_uploader('Завантажте файл CSV', type=['csv'])
     
     if uploaded_file is not None:
         data = load_data(uploaded_file)
