@@ -52,26 +52,26 @@ def create_tensorflow_model():
          predicted_rate = scaler.inverse_transform(predicted_rate)
          return predicted_rate[0][0]
 
-         st.title('Exchange Rate Prediction LSTM model')
+     st.title('Exchange Rate Prediction LSTM model')
 
-         # Upload historical data file
-         uploaded_file = st.file_uploader('Upload CSV file', type=['csv'])
+     # Upload historical data file
+     uploaded_file = st.file_uploader('Upload CSV file', type=['csv'])
 
-         if uploaded_file is not None:
-             data = load_data(uploaded_file)
+     if uploaded_file is not None:
+         data = load_data(uploaded_file)
 
-             st.subheader('Historical Data')
-             st.dataframe(data)  # Display all loaded values
+         st.subheader('Historical Data')
+         st.dataframe(data)  # Display all loaded values
 
-             model = create_model()
+         model = create_model()
 
-             st.subheader('Train Model')
-             train_model(model, data['Rate'].values.reshape(-1, 1))
-             st.write('Model training complete.')
+         st.subheader('Train Model')
+         train_model(model, data['Rate'].values.reshape(-1, 1))
+         st.write('Model training complete.')
 
-             st.subheader('Exchange Rate Prediction')
-             prediction = predict_rate(model, data['Rate'].values.reshape(-1, 1))
-             st.write('Predicted exchange rate:', prediction)
+         st.subheader('Exchange Rate Prediction')
+         prediction = predict_rate(model, data['Rate'].values.reshape(-1, 1))
+         st.write('Predicted exchange rate:', prediction)
      
      
      
