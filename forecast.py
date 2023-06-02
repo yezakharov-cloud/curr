@@ -10,7 +10,53 @@ from sklearn.preprocessing import MinMaxScaler
 # Function to create a TensorFlow model
 def create_tensorflow_model():
      st.write('TensorFlow works OK')
+# Load historical exchange rate data from CSV file
+def load_data(filename):
+    data = pd.read_csv(filename)
+    return data
 
+# Create a LSTM model for exchange rate prediction
+def create_model():
+    model = Sequential()
+    model.add(LSTM(units=50, return_sequences=True, input_shape=(1, 1)))
+    model.add(LSTM(units=50))
+    model.add(Dense(units=1))
+    model.compile(optimizer='adam', loss='mean_squared_error')
+    return model
+
+# Train the LSTM model
+def train_model(model, data):
+    scaler = MinMaxScaler(feature_range=(0, 1))
+    scaled_data = scaler.fit_transform(data)
+    
+    x_train = []
+    y_train = []
+    for i in range(1, len(scaled_data)):
+        x_train.append(scaled_data[i-1:i])
+        y_train.append(scaled_data[i])
+    
+    x_train, y_train = np.array(x_train), np.array(y_train)
+    x_train = np.reshape(x_train, (x_train.shape[0], x_train.shape[1], 1))
+    
+    model.fit(x_train, y_train, epochs=20, batch_size=1, verbose=2)
+
+# Predict the exchange rate using the trained model
+def predict_rate(model, data):
+    scaler = MinMaxScaler(feature_range=(0, 1))
+    scaled_data = scaler.fit_transform(data)
+    
+    x_test = np.array([scaled_data[-1]])
+    x_test = np.reshape(x_test, (x_test.shape[0], x_test.shape[1], 1))
+    
+    predicted_rate = model.predict(x_test)
+    predicted_rate = scaler.inverse_transform(predicted_rate)
+    return predicted_rate[0][0]
+
+     
+     
+     
+     
+     
     
 # Function to create a Keras model
 def create_keras_model():
