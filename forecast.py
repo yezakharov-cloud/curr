@@ -91,9 +91,9 @@ def predict_rate2(model2, data):
     predicted_rate = scaler.inverse_transform(predicted_rate)
     return predicted_rate[0][0]
 
-def calculate_error(prediction, prediction2, result):
-    error1 = abs(result - prediction)
-    error2 = abs(result - prediction2)
+def calculate_error(prediction, prediction2, current_rate):
+    error1 = abs((current_rate - prediction) / current_rate) * 100
+    error2 = abs((current_rate - prediction2) / current_rate) * 100
     return error1, error2
 
 # Main function
@@ -137,14 +137,18 @@ def main():
         prediction2 = predict_rate2(model2, data['Rate'].values.reshape(-1, 1))
         st.write('Прогнозований обмінний курс:', prediction2)
 
-        error1, error2 = calculate_error(prediction, prediction2, result)
+        current_rate = 1.2345  # Replace with the actual current exchange rate
+        prediction = 1.2356  # Replace with the calculated prediction
+        prediction2 = 1.2378  # Replace with another calculated prediction
+
+        error1, error2 = calculate_error(prediction, prediction2, current_rate)
 
         st.title("Exchange Rate Prediction Error")
-        st.write(f"Current Rate: {result}")
+        st.write(f"Current Rate: {current_rate}")
         st.write(f"Prediction 1: {prediction}")
         st.write(f"Prediction 2: {prediction2}")
-        st.write(f"Error for Prediction 1: {error1}")
-        st.write(f"Error for Prediction 2: {error2}")
+        st.write(f"Error for Prediction 1: {error1:.2f}%")
+        st.write(f"Error for Prediction 2: {error2:.2f}%")
 
 
 # Run the application
