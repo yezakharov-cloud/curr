@@ -8,20 +8,15 @@ from tensorflow.keras.layers import Dense, LSTM
 from sklearn.preprocessing import MinMaxScaler
 
 # Display the radio buttons
-choice = st.radio("Виберіть опцію:", ("Курс валюти не відомий", "Курс валюти відомий"))
+choice = st.radio("Оберіть опцію:", ("Курс валюти не відомий", "Курс валюти відомий"))
 
 if choice == "Курс валюти не відомий":
-    st.write("Condition 1 is met.")
-
+    current_rate = 0
 elif choice == "Курс валюти відомий":
     st.title("Введіть відомий курс валюти")
     current_rate = st.number_input('приклад:(50)')
     if current_rate:
         st.write(f"Поточний курс: {current_rate}")
-
-
-
-
 
 # Load historical exchange rate data from CSV file
 def load_data(filename):
