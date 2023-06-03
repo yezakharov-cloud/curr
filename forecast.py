@@ -17,11 +17,6 @@ elif choice == "Курс валюти відомий":
     current_rate = st.number_input('приклад:(50)')
     if current_rate:
         st.write(f"Поточний курс: {current_rate}")
-        
-if current_rate == 0:
-    st.write("Condition 1 is met.")
-else: 
-    st.write("Condition 2 is met.")
 
 # Load historical exchange rate data from CSV file
 def load_data(filename):
@@ -65,8 +60,6 @@ def predict_rate(model, data):
     predicted_rate = scaler.inverse_transform(predicted_rate)
     return predicted_rate[0][0]
 
-
-
 # Create a Keras model for exchange rate prediction
 def create_model2():
     model2 = Sequential()
@@ -98,7 +91,6 @@ def predict_rate2(model2, data):
 
 # Main function
 def main():
-
    
     # Upload historical data file
     uploaded_file = st.file_uploader('Завантажте файл CSV', type=['csv'])
@@ -137,16 +129,19 @@ def main():
         prediction2 = predict_rate2(model2, data['Rate'].values.reshape(-1, 1))
 
         st.write('Прогнозований обмінний курс:', prediction2)
+    
+                
+        if current_rate != 0:
 
-        error1 = abs((current_rate - prediction) / current_rate) * 100
-        error2 = abs((current_rate - prediction2) / current_rate) * 100
+            error1 = abs((current_rate - prediction) / current_rate) * 100
+            error2 = abs((current_rate - prediction2) / current_rate) * 100
 
-        st.title("Похибка прогнозування обмінного курсу")
-        st.write(f"Поточний курс: {current_rate}")
-        st.write(f"Прогнозування 1: ", round(prediction,4))
-        st.write(f"Прогнозування 2: ", round(prediction2,4))
-        st.write(f"Похибка 1: ", round(error1,2),"%")
-        st.write(f"Похибка 2: ", round(error2,2),"%")
+            st.title("Похибка прогнозування обмінного курсу")
+            st.write(f"Поточний курс: {current_rate}")
+            st.write(f"Прогнозування 1: ", round(prediction,4))
+            st.write(f"Прогнозування 2: ", round(prediction2,4))
+            st.write(f"Похибка 1: ", round(error1,2),"%")
+            st.write(f"Похибка 2: ", round(error2,2),"%")
 
 
 
