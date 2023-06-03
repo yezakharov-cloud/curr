@@ -142,8 +142,8 @@ def main():
             st.write(f"Поточний курс: {current_rate}")
             st.write(f"Прогнозування Модель 1: ", round(prediction,4))
             st.write(f"Прогнозування Модель 2: ", round(prediction2,4))
-            st.write(f"Модель 1: ", round(error1,2),"%")
-            st.write(f"Модель 2: ", round(error2,2),"%")
+            st.write(f"Похибка Модель 1: ", round(error1,2),"%")
+            st.write(f"Похибка Модель 2: ", round(error2,2),"%")
 
 
 
