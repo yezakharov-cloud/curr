@@ -20,7 +20,7 @@ elif choice == "Курс валюти відомий":
         
 if current_rate == 0:
     st.write("Condition 1 is met.")
-else 
+else: 
     st.write("Condition 2 is met.")
 
 # Load historical exchange rate data from CSV file
