@@ -7,6 +7,21 @@ from tensorflow.keras.layers import Dense
 from tensorflow.keras.layers import Dense, LSTM
 from sklearn.preprocessing import MinMaxScaler
 
+# Display the radio buttons
+choice = st.radio("Select an option:", ("Radio1", "Radio2"))
+
+# Branch based on the selected option
+if choice == "Radio1":
+    # Code block for condition when Radio1 is selected
+    st.write("Condition 1 is met.")
+    # Add your code here for the condition when Radio1 is selected
+
+elif choice == "Radio2":
+    # Code block for condition when Radio2 is selected
+    st.write("Condition 2 is met.")
+    # Add your code here for the condition when Radio2 is selected
+
+# Add your code here that will be executed regardless of the selected option
 
 
 st.title("Введіть відомий курс валюти")
