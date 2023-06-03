@@ -17,6 +17,11 @@ elif choice == "Курс валюти відомий":
     current_rate = st.number_input('приклад:(50)')
     if current_rate:
         st.write(f"Поточний курс: {current_rate}")
+        
+if current_rate == 0:
+    st.write("Condition 1 is met.")
+else 
+    st.write("Condition 2 is met.")
 
 # Load historical exchange rate data from CSV file
 def load_data(filename):
