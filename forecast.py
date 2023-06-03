@@ -98,34 +98,34 @@ def main():
     if uploaded_file is not None:
         data = load_data(uploaded_file)
 
-        st.title('Прогноз обмінного курсу TensorFlow')
+        st.title('Прогноз обмінного курсу Модель 1')
 
         st.subheader('Історичні дані')
         st.dataframe(data)  # Display all loaded values
         
         model = create_model()
         
-        st.subheader('Навчання моделі TensorFlow ...')
+        st.subheader('Навчання моделі Модель 1 ...')
         train_model(model, data['Rate'].values.reshape(-1, 1))
-        st.write('Навчання моделі TensorFlow завершено')
+        st.write('Навчання моделі Модель 1 завершено')
         
-        st.subheader('Прогноз обмінного курсу TensorFlow')
+        st.subheader('Прогноз обмінного курсу Модель 1')
         prediction = predict_rate(model, data['Rate'].values.reshape(-1, 1))
 
         st.write('Прогнозований обмінний курс:', prediction)
 
-        st.title('Прогнозування обмінного курсу Keras')
+        st.title('Прогнозування обмінного курсу Модель 2')
 
         st.subheader('Історичні дані')
         st.dataframe(data)  # Display all loaded values
 
         model2 = create_model2()
 
-        st.subheader('Навчання моделі Keras ...')
+        st.subheader('Навчання моделі Модель 2 ...')
         train_model2(model2, data['Rate'].values.reshape(-1, 1))
-        st.write('Навчання моделі Keras завершено')
+        st.write('Навчання моделі Модель 2 завершено')
 
-        st.subheader('Прогнозування обмінного курсу Keras')
+        st.subheader('Прогнозування обмінного курсу Модель 2')
         prediction2 = predict_rate2(model2, data['Rate'].values.reshape(-1, 1))
 
         st.write('Прогнозований обмінний курс:', prediction2)
@@ -138,10 +138,10 @@ def main():
 
             st.title("Похибка прогнозування обмінного курсу")
             st.write(f"Поточний курс: {current_rate}")
-            st.write(f"Прогнозування 1: ", round(prediction,4))
-            st.write(f"Прогнозування 2: ", round(prediction2,4))
-            st.write(f"Похибка 1: ", round(error1,2),"%")
-            st.write(f"Похибка 2: ", round(error2,2),"%")
+            st.write(f"Прогнозування Модель 1: ", round(prediction,4))
+            st.write(f"Прогнозування Модель 2: ", round(prediction2,4))
+            st.write(f"Модель 1: ", round(error1,2),"%")
+            st.write(f"Модель 2: ", round(error2,2),"%")
 
 
 
