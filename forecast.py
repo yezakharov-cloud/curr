@@ -14,7 +14,10 @@ choice = st.radio("Select an option:", ("Курс валюти відомий", 
 if choice == "Курс валюти відомий":
     # Code block for condition when Radio1 is selected
     st.write("Condition 1 is met.")
-    # Add your code here for the condition when Radio1 is selected
+    st.title("Введіть відомий курс валюти")
+    current_rate = st.number_input('приклад:(50)')
+    if current_rate:
+        st.write(f"Поточний курс: {current_rate}")
 
 elif choice == "Курс валюти не відомий":
     # Code block for condition when Radio2 is selected
@@ -24,10 +27,6 @@ elif choice == "Курс валюти не відомий":
 # Add your code here that will be executed regardless of the selected option
 
 
-st.title("Введіть відомий курс валюти")
-current_rate = st.number_input('приклад:(50)')
-if current_rate:
-    st.write(f"Поточний курс: {current_rate}")
 
 # Load historical exchange rate data from CSV file
 def load_data(filename):
