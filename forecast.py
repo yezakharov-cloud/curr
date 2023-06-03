@@ -12,11 +12,11 @@ choice = st.radio("Select an option:", ("Курс валюти не відоми
 
 # Branch based on the selected option
 if choice == "Курс валюти не відомий":
-
+    st.write("Condition 1 is met.")
 
 elif choice == "Курс валюти відомий":
     # Code block for condition when Radio1 is selected
-    st.write("Condition 1 is met.")
+    st.write("Condition 2 is met.")
     st.title("Введіть відомий курс валюти")
     current_rate = st.number_input('приклад:(50)')
     if current_rate:
