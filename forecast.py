@@ -7,6 +7,8 @@ from tensorflow.keras.layers import Dense
 from tensorflow.keras.layers import Dense, LSTM
 from sklearn.preprocessing import MinMaxScaler
 
+st.write(f"Веб-сервіс формування рекомендацій для коригування прогнозу фінансово-економічних показників на основі аналізу новин")
+
 # Display the radio buttons
 choice = st.radio("Оберіть опцію:", ("Курс валюти не відомий", "Курс валюти відомий"))
 
