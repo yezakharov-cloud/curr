@@ -8,15 +8,12 @@ from tensorflow.keras.layers import Dense, LSTM
 from sklearn.preprocessing import MinMaxScaler
 
 # Display the radio buttons
-choice = st.radio("Select an option:", ("Курс валюти не відомий", "Курс валюти відомий"))
+choice = st.radio("Виберіть опцію:", ("Курс валюти не відомий", "Курс валюти відомий"))
 
-# Branch based on the selected option
 if choice == "Курс валюти не відомий":
     st.write("Condition 1 is met.")
 
 elif choice == "Курс валюти відомий":
-    # Code block for condition when Radio1 is selected
-    st.write("Condition 2 is met.")
     st.title("Введіть відомий курс валюти")
     current_rate = st.number_input('приклад:(50)')
     if current_rate:
