@@ -138,10 +138,11 @@ def main():
             error1 = abs((current_rate - prediction) / current_rate) * 100
             error2 = abs((current_rate - prediction2) / current_rate) * 100
 
-            st.title("Похибка прогнозування обмінного курсу")
+            st.title("Прогнозування обмінного курсу")
             st.write(f"Поточний курс: {current_rate}")
             st.write(f"Прогнозування Модель 1: ", round(prediction,4))
             st.write(f"Прогнозування Модель 2: ", round(prediction2,4))
+            st.title("Похибка прогнозування обмінного курсу")
             st.write(f"Похибка Модель 1: ", round(error1,2),"%")
             st.write(f"Похибка Модель 2: ", round(error2,2),"%")
 
