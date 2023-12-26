@@ -1,19 +1,33 @@
+
 import streamlit as st
 import pandas as pd
 import numpy as np
 import tensorflow as tf
 from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Dense
 from tensorflow.keras.layers import Dense, LSTM
 from sklearn.preprocessing import MinMaxScaler
-import os
 
-# Function to load historical data
+st.write(f"Веб-сервіс формування рекомендацій для коригування прогнозу фінансово-економічних показників на основі аналізу новин")
+
+# Display the radio buttons
+choice = st.radio("Оберіть опцію:", ("Курс валюти не відомий", "Курс валюти відомий"))
+
+if choice == "Курс валюти не відомий":
+    current_rate = 0
+elif choice == "Курс валюти відомий":
+    st.title("Введіть відомий курс валюти")
+    current_rate = st.number_input('приклад:(50)')
+    if current_rate:
+        st.write(f"Поточний курс: {current_rate}")
+
+# Load historical exchange rate data from CSV file
 def load_data(filename):
     data = pd.read_csv(filename)
     return data
 
-# Function to create an LSTM model
-def create_lstm_model():
+# Create a LSTM model for exchange rate prediction
+def create_model():
     model = Sequential()
     model.add(LSTM(units=50, return_sequences=True, input_shape=(1, 1)))
     model.add(LSTM(units=50))
@@ -21,8 +35,8 @@ def create_lstm_model():
     model.compile(optimizer='adam', loss='mean_squared_error')
     return model
 
-# Function to train an LSTM model
-def train_lstm_model(model, data):
+# Train the LSTM model
+def train_model(model, data):
     scaler = MinMaxScaler(feature_range=(0, 1))
     scaled_data = scaler.fit_transform(data)
     
@@ -36,11 +50,11 @@ def train_lstm_model(model, data):
     x_train = np.reshape(x_train, (x_train.shape[0], x_train.shape[1], 1))
     
     model.fit(x_train, y_train, epochs=20, batch_size=1, verbose=2)
-    return model, scaler
 
-# Function to predict the next day's rate using the LSTM model
-def predict_next_day_rate_lstm(model, scaler, data):
-    scaled_data = scaler.transform(data)
+# Predict the exchange rate using the trained model
+def predict_rate(model, data):
+    scaler = MinMaxScaler(feature_range=(0, 1))
+    scaled_data = scaler.fit_transform(data)
     
     x_test = np.array([scaled_data[-1]])
     x_test = np.reshape(x_test, (x_test.shape[0], x_test.shape[1], 1))
@@ -49,97 +63,93 @@ def predict_next_day_rate_lstm(model, scaler, data):
     predicted_rate = scaler.inverse_transform(predicted_rate)
     return predicted_rate[0][0]
 
-# Function to create a simple neural network model
-def create_nn_model():
-    model = Sequential()
-    model.add(Dense(units=50, activation='relu', input_shape=(1,)))
-    model.add(Dense(units=50, activation='relu'))
-    model.add(Dense(units=1))
-    model.compile(optimizer='adam', loss='mean_squared_error')
-    return model
+# Create a Keras model for exchange rate prediction
+def create_model2():
+    model2 = Sequential()
+    model2.add(Dense(units=50, activation='relu', input_shape=(1,)))
+    model2.add(Dense(units=50, activation='relu'))
+    model2.add(Dense(units=1))
+    model2.compile(optimizer='adam', loss='mean_squared_error')
+    return model2
 
-# Function to train a simple neural network model
-def train_nn_model(model, data):
+# Train the Keras model
+def train_model2(model2, data):
     scaler = MinMaxScaler(feature_range=(0, 1))
     scaled_data = scaler.fit_transform(data)
 
     x_train = scaled_data[:-1]
     y_train = scaled_data[1:]
 
-    model.fit(x_train, y_train, epochs=20, batch_size=1, verbose=2)
-    return model, scaler
+    model2.fit(x_train, y_train, epochs=20, batch_size=1, verbose=2)
 
-# Function to predict the next day's rate using the simple neural network model
-def predict_next_day_rate_nn(model, scaler, data):
-    scaled_data = scaler.transform(data)
+# Predict the exchange rate using the trained model
+def predict_rate2(model2, data):
+    scaler = MinMaxScaler(feature_range=(0, 1))
+    scaled_data = scaler.fit_transform(data)
 
     x_test = scaled_data[-1]
-    predicted_rate = model.predict(np.array([x_test]))
+    predicted_rate = model2.predict(np.array([x_test]))
     predicted_rate = scaler.inverse_transform(predicted_rate)
     return predicted_rate[0][0]
 
 # Main function
 def main():
-    st.title("Gold Price Prediction App")
+   
+    # Upload historical data file
+    uploaded_file = st.file_uploader('Завантажте файл CSV', type=['csv'])
+    
+    if uploaded_file is not None:
+        data = load_data(uploaded_file)
 
-    # Upload historical gold price data file
-    uploaded_gold_file = st.file_uploader('Upload CSV file for historical gold prices', type=['csv'])
+        st.title('Прогноз обмінного курсу Модель 1')
 
-    if uploaded_gold_file is not None:
-        gold_data = load_data(uploaded_gold_file)
+        st.subheader('Історичні дані')
+        st.dataframe(data)  # Display all loaded values
+        
+        model = create_model()
+        
+        st.subheader('Навчання моделі Модель 1 ...')
+        train_model(model, data['Rate'].values.reshape(-1, 1))
+        st.write('Навчання моделі Модель 1 завершено')
+        
+        st.subheader('Прогноз обмінного курсу Модель 1')
+        prediction = predict_rate(model, data['Rate'].values.reshape(-1, 1))
 
-        st.subheader('Historical Gold Price Data')
-        st.dataframe(gold_data)
+        st.write('Прогнозований обмінний курс:', prediction)
 
-        # Choose the model
-        model_choice = st.radio("Choose a model for prediction:", ("LSTM Model", "Simple Neural Network Model"))
+        st.title('Прогнозування обмінного курсу Модель 2')
 
-        if model_choice == "LSTM Model":
-            st.subheader('LSTM Model for Gold Price Prediction')
+        st.subheader('Історичні дані')
+        st.dataframe(data)  # Display all loaded values
 
-            lstm_model_file = st.file_uploader('Upload saved LSTM model file', type=['h5'])
+        model2 = create_model2()
 
-            lstm_model = None
-            lstm_scaler = None
+        st.subheader('Навчання моделі Модель 2 ...')
+        train_model2(model2, data['Rate'].values.reshape(-1, 1))
+        st.write('Навчання моделі Модель 2 завершено')
 
-            if lstm_model_file is not None:
-                lstm_model = tf.keras.models.load_model(lstm_model_file)
-                lstm_scaler = MinMaxScaler(feature_range=(0, 1))
-                lstm_scaler.fit_transform(gold_data)
-            
-            if lstm_model is None or st.button('Train New LSTM Model'):
-                lstm_model, lstm_scaler = train_lstm_model(create_lstm_model(), gold_data)
+        st.subheader('Прогнозування обмінного курсу Модель 2')
+        prediction2 = predict_rate2(model2, data['Rate'].values.reshape(-1, 1))
 
-            next_day_rate_lstm = predict_next_day_rate_lstm(lstm_model, lstm_scaler, gold_data['Price'].values.reshape(-1, 1))
+        st.write('Прогнозований обмінний курс:', prediction2)
+    
+                
+        if current_rate != 0:
 
-            st.write('Predicted Gold Price for the Next Day (LSTM Model):', next_day_rate_lstm)
+            error1 = abs((current_rate - prediction) / current_rate) * 100
+            error2 = abs((current_rate - prediction2) / current_rate) * 100
 
-        elif model_choice == "Simple Neural Network Model":
-            st.subheader('Simple Neural Network Model for Gold Price Prediction')
+            st.title("Прогнозування обмінного курсу")
+            st.write(f"Поточний курс: {current_rate}")
+            st.write(f"Прогнозування Модель 1: ", round(prediction,4))
+            st.write(f"Прогнозування Модель 2: ", round(prediction2,4))
+            st.title("Похибка прогнозування обмінного курсу")
+            st.write(f"Похибка Модель 1: ", round(error1,2),"%")
+            st.write(f"Похибка Модель 2: ", round(error2,2),"%")
 
-            nn_model_file = st.file_uploader('Upload saved Neural Network model file', type=['h5'])
 
-            nn_model = None
-            nn_scaler = None
 
-            if nn_model_file is not None:
-                nn_model = tf.keras.models.load_model(nn_model_file)
-                nn_scaler = MinMaxScaler(feature_range=(0, 1))
-                nn_scaler.fit_transform(gold_data)
-            
-            if nn_model is None or st.button('Train New Neural Network Model'):
-                nn_model, nn_scaler = train_nn_model(create_nn_model(), gold_data)
 
-            next_day_rate_nn = predict_next_day_rate_nn(nn_model, nn_scaler, gold_data['Price'].values.reshape(-1, 1))
-
-            st.write('Predicted Gold Price for the Next Day (Neural Network Model):', next_day_rate_nn)
-
-    # Save the models
-    if lstm_model is not None:
-        lstm_model.save("lstm_model.h5")
-
-    if nn_model is not None:
-        nn_model.save("nn_model.h5")
-
+    # Run the application
 if __name__ == '__main__':
     main()
